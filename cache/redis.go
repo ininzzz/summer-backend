@@ -95,9 +95,9 @@ func main() {
 	ctx := context.Background()
 
 	rdb := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "", // no password set
-		DB:       0,  // use default DB
+		Addr:     "124.222.25.150:6379",
+		Password: "123456",
+		DB:       0, // use default DB
 	})
 	RedisClient = rdb
 	data := TestStuct{
