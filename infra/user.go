@@ -11,23 +11,30 @@ type User struct {
 	ID       int64  `gorm:"primary_key"`
 	Username string `gorm:"column:username"`
 	Password string `gorm:"column:password"`
+	Gender   int    `gorm:"column:gender"`
+	Email    string `gorm:"column:email"`
+	Nickname string `gorm:"column:nick_name"`
 }
 
 type UserQuery struct {
+	ID       *int64
 	Username *string
 	Password *string
 }
 
 type UserRepo struct {
-	db *gorm.DB
 }
 
 func (u *UserRepo) Save(ctx context.Context, user *model.User) error {
-	err := u.db.Where("id = ?", user.ID).Error
+	userDO, err := u.toDO(user)
+	if err != nil {
+		return err
+	}
+	err = db.Where("id = ?", userDO.ID).Error
 	if err == gorm.ErrRecordNotFound {
-		err = u.db.Create(user).Error
+		err = db.Create(userDO).Error
 	} else if err == nil {
-		err = u.db.Save(user).Error
+		err = db.Save(userDO).Error
 	}
 	if err != nil {
 		return err
@@ -36,16 +43,24 @@ func (u *UserRepo) Save(ctx context.Context, user *model.User) error {
 }
 
 func (u *UserRepo) Find(ctx context.Context, user *UserQuery) ([]*model.User, error) {
-	ans := []*model.User{}
+	userDOs := []*User{}
 	if user.Username != nil {
-		u.db = u.db.Where("username = ?", user.Username)
+		db = db.Where("username = ?", user.Username)
 	}
 	if user.Password != nil {
-		u.db = u.db.Where("password = ?", user.Password)
+		db = db.Where("password = ?", user.Password)
 	}
-	err := u.db.Find(&ans).Error
+	err := db.Find(&userDOs).Error
 	if err != nil {
 		return nil, err
+	}
+	ans := []*model.User{}
+	for _, userDO := range userDOs {
+		user, err := u.toModel(userDO)
+		if err != nil {
+			return nil, err
+		}
+		ans = append(ans, user)
 	}
 	return ans, nil
 }
