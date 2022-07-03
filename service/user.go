@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"fmt"
+	"strconv"
 
 	"github.com/ininzzz/summer-backend/common"
 	"github.com/ininzzz/summer-backend/dto"
@@ -18,8 +20,13 @@ type userService struct {
 func (u *userService) Login(ctx context.Context, loginDTO *dto.LoginRequestDTO) (*common.Response, error) {
 	users, err := u.userRepo.Find(ctx, &infra.UserQuery{
 		Username: &loginDTO.Username,
+		Password: &loginDTO.Password,
 	})
 	if err != nil {
+		logrus.Errorf("[userService Login] err: %v", err.Error())
+		return common.NewResponseOfErr(err), err
+	} else if len(users) == 0 {
+		err := fmt.Errorf("record not found")
 		logrus.Errorf("[userService Login] err: %v", err.Error())
 		return common.NewResponseOfErr(err), err
 	}
@@ -29,21 +36,28 @@ func (u *userService) Login(ctx context.Context, loginDTO *dto.LoginRequestDTO) 
 		return common.NewResponseOfErr(err), err
 	}
 	data := &dto.LoginResponseDTO{
-		Token: token,
+		UserID: users[0].ID,
+		Token:  token,
 	}
 	return common.NewResponseOfSuccess(data), nil
 }
 
 func (u *userService) Info(ctx context.Context, infoDTO *dto.InfoRequestDTO) (*common.Response, error) {
-	users, err := u.userRepo.Find(ctx, &infra.UserQuery{
-		ID: &infoDTO.UserID,
-	})
+	userID, err := strconv.Atoi(infoDTO.UserID)
+	if err != nil {
+		logrus.Errorf("[blogService BlogInfo] err: %v", err.Error())
+		return common.NewResponseOfErr(err), err
+	}
+	user, err := u.userRepo.FindByID(ctx, int64(userID))
 	if err != nil {
 		logrus.Errorf("[userService Info] err: %v", err.Error())
 		return common.NewResponseOfErr(err), err
 	}
 	data := &dto.InfoResponseDTO{
-		Username: users[0].Username,
+		Username: user.Username,
+		Gender:   user.Gender,
+		Email:    user.Email,
+		Icon:     string(user.Icon),
 	}
 	return common.NewResponseOfSuccess(data), nil
 }

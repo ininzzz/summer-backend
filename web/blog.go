@@ -15,7 +15,7 @@ type blogWebHandler struct{}
 
 func (u *blogWebHandler) List(c *gin.Context) {
 	dto := dto.BlogListRequestDTO{
-		UserID: c.GetInt64("UserID"),
+		UserID: c.Param("user_id"),
 	}
 	resp, err := service.BlogService.List(c, &dto)
 	if err != nil {

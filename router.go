@@ -15,7 +15,7 @@ func register(r *gin.Engine) {
 	}
 	blogGroup := r.Group("/blog")
 	{
-		blogGroup.GET("/list", web.BlogWebHandler.List)
+		blogGroup.GET("/list/:user_id", web.BlogWebHandler.List)
 		blogGroup.GET("/:blog_id", web.BlogWebHandler.Info)
 	}
 }

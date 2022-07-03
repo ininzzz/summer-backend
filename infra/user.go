@@ -13,7 +13,7 @@ type User struct {
 	Password string `gorm:"column:password"`
 	Gender   int    `gorm:"column:gender"`
 	Email    string `gorm:"column:email"`
-	Nickname string `gorm:"column:nick_name"`
+	Icon     string `gorm:"column:icon"`
 }
 
 type UserQuery struct {
@@ -42,6 +42,19 @@ func (u *UserRepo) Save(ctx context.Context, user *model.User) error {
 	return nil
 }
 
+func (u *UserRepo) FindByID(ctx context.Context, id int64) (*model.User, error) {
+	userDO := &User{}
+	err := db.Where("id = ?", id).Find(&userDO).Error
+	if err != nil {
+		return nil, err
+	}
+	user, err := u.toModel(userDO)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
 func (u *UserRepo) Find(ctx context.Context, user *UserQuery) ([]*model.User, error) {
 	userDOs := []*User{}
 	if user.Username != nil {
@@ -66,17 +79,33 @@ func (u *UserRepo) Find(ctx context.Context, user *UserQuery) ([]*model.User, er
 }
 
 func (u *UserRepo) toDO(user *model.User) (*User, error) {
+	gender := 0
+	if user.Gender == "女" {
+		gender = 1
+	}
 	return &User{
 		ID:       user.ID,
 		Username: user.Username,
 		Password: user.Password,
+		Gender:   gender,
+		Email:    user.Email,
+		Icon:     string(user.Icon),
 	}, nil
 }
 
 func (u *UserRepo) toModel(user *User) (*model.User, error) {
+	gender := ""
+	if user.Gender == 0 {
+		gender = "男"
+	} else {
+		gender = "女"
+	}
 	return &model.User{
 		ID:       user.ID,
 		Username: user.Username,
 		Password: user.Password,
+		Gender:   gender,
+		Email:    user.Email,
+		Icon:     []byte(user.Email),
 	}, nil
 }
