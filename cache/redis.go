@@ -5,12 +5,32 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
 	"strconv"
 	"time"
 
 	"github.com/go-redis/redis/v8"
 )
 
+var RedisClient *redis.Client
+
+func InitRedis() {
+	//初始化client
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     os.Getenv("REDIS_ADDR"),
+		Password: os.Getenv("REDIS_PWD"),
+		DB:       0, // use default DB
+	})
+	//测试链接
+	_, err := rdb.Ping(context.Background()).Result()
+	if err != nil {
+		panic(err)
+	}
+	//设置全局变量client
+	RedisClient = rdb
+}
+
+//以下为测试使用
 //kp = key prefix
 const (
 	TestSetKey  = "TestSetKey"
@@ -26,8 +46,6 @@ type TestStuct struct {
 	Id       int    `json:"id"`
 	Password string `json:"pwd"`
 }
-
-var RedisClient *redis.Client
 
 //结构体转map
 func struct2map(content interface{}) map[string]interface{} {
@@ -74,7 +92,7 @@ const (
 	timestampShift = sequenceBits      // 时间戳左移位数
 )
 
-func getId(ctx context.Context, kind string) int64 {
+func GetId(ctx context.Context, kind string) int64 {
 	now := time.Now()
 	date := fmt.Sprintf("%d-%d-%d", now.Year(), now.Month(), now.Day())
 	timestamp := now.Unix()
@@ -90,16 +108,19 @@ func getId(ctx context.Context, kind string) int64 {
 	// 	getId(ctx, "blog")
 	// }
 }
-func main() {
-	//初始化
-	ctx := context.Background()
 
-	rdb := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "", // no password set
-		DB:       0,  // use default DB
-	})
-	RedisClient = rdb
+// // 延长过期时间
+// func ExpireRedis(key string, t int) bool {
+// 	expire := time.Duration(t) * time.Second
+// 	if err := Redis.Expire(ctx, key, expire).Err(); err != nil {
+// 		fmt.Println(err)
+// 		return false
+// 	}
+// 	return true
+// }
+
+func Test() {
+	ctx := context.Background()
 	data := TestStuct{
 		1,
 		"中文",
@@ -110,7 +131,7 @@ func main() {
 	}
 
 	// hgetall参数：ctx,key
-	hmap, err := rdb.HGetAll(ctx, TestHSetKey).Result()
+	hmap, err := RedisClient.HGetAll(ctx, TestHSetKey).Result()
 	if err != nil {
 		fmt.Printf("hmgetall error: %v\n", err)
 		return
@@ -133,13 +154,3 @@ func main() {
 	data3.Password = hmap["pwd"]
 	fmt.Printf("data3: %v\n", data3)
 }
-
-// // 延长过期时间
-// func ExpireRedis(key string, t int) bool {
-// 	expire := time.Duration(t) * time.Second
-// 	if err := Redis.Expire(ctx, key, expire).Err(); err != nil {
-// 		fmt.Println(err)
-// 		return false
-// 	}
-// 	return true
-// }
