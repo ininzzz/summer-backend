@@ -5,6 +5,7 @@ import (
 )
 
 func main() {
+	InitConfigure()
 	r := gin.Default()
 	register(r)
 	r.Run()
