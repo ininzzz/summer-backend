@@ -8,12 +8,13 @@ import (
 )
 
 type User struct {
-	ID       int64  `gorm:"primary_key"`
-	Username string `gorm:"column:username"`
-	Password string `gorm:"column:password"`
-	Gender   int    `gorm:"column:gender"`
-	Email    string `gorm:"column:email"`
-	Nickname string `gorm:"column:nick_name"`
+	ID         int64  `gorm:"primary_key"`
+	Username   string `gorm:"column:username"`
+	Password   string `gorm:"column:password"`
+	UserAvatar string `gorm:"column:user_avatar"`
+	Gender     int    `gorm:"column:gender"`
+	Email      string `gorm:"column:email"`
+	Nickname   string `gorm:"column:nick_name"`
 }
 
 type UserQuery struct {
@@ -42,6 +43,27 @@ func (u *UserRepo) Save(ctx context.Context, user *model.User) error {
 	return nil
 }
 
+//根据用户ID查找用户
+func (u *UserRepo) FindByID(ctx context.Context, user *UserQuery) ([]*model.User, error) {
+	userDOs := []*User{}
+	if user.ID != nil {
+		db = db.Where("username = ?", user.Username)
+	}
+	err := db.Find(&userDOs).Error
+	if err != nil {
+		return nil, err
+	}
+	ans := []*model.User{}
+	for _, userDO := range userDOs {
+		user, err := u.toModel(userDO)
+		if err != nil {
+			return nil, err
+		}
+		ans = append(ans, user)
+	}
+	return ans, nil
+}
+
 func (u *UserRepo) Find(ctx context.Context, user *UserQuery) ([]*model.User, error) {
 	userDOs := []*User{}
 	if user.Username != nil {
@@ -67,16 +89,18 @@ func (u *UserRepo) Find(ctx context.Context, user *UserQuery) ([]*model.User, er
 
 func (u *UserRepo) toDO(user *model.User) (*User, error) {
 	return &User{
-		ID:       user.ID,
-		Username: user.Username,
-		Password: user.Password,
+		ID:         user.ID,
+		Username:   user.Username,
+		Password:   user.Password,
+		UserAvatar: user.UserAvatar,
 	}, nil
 }
 
 func (u *UserRepo) toModel(user *User) (*model.User, error) {
 	return &model.User{
-		ID:       user.ID,
-		Username: user.Username,
-		Password: user.Password,
+		ID:         user.ID,
+		Username:   user.Username,
+		Password:   user.Password,
+		UserAvatar: user.UserAvatar,
 	}, nil
 }
