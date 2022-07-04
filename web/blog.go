@@ -14,11 +14,13 @@ var BlogWebHandler = &blogWebHandler{}
 
 type blogWebHandler struct{}
 
+
 // 查看首页帖子【基于滚动分页】  /home/list
 func (u *blogWebHandler) HomeList(c *gin.Context) {
 	lastTimeStamp, _ := strconv.ParseInt(c.Param("lastTimeStamp"), 10, 64)
 	dto := dto.BlogHomeListRequestDTO{
 		LastTimeStamp: lastTimeStamp,
+
 	}
 	resp, err := service.BlogService.HomeList(c, &dto)
 	if err != nil {

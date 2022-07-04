@@ -33,7 +33,7 @@ func (u *userWebHandler) Login(c *gin.Context) {
 
 func (u *userWebHandler) Info(c *gin.Context) {
 	dto := dto.InfoRequestDTO{
-		UserID: c.GetInt64("UserID"),
+		UserID: c.Query("user_id"),
 	}
 	resp, err := service.UserService.Info(c, &dto)
 	if err != nil {
