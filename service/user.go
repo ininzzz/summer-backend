@@ -62,7 +62,6 @@ func (u *userService) Info(ctx context.Context, infoDTO *dto.InfoRequestDTO) (*c
 	return common.NewResponseOfSuccess(data), nil
 }
 
-
 func (u *userService) FindInfoByID(ctx context.Context, infoDTO *dto.InfoRequestDTO) (*common.Response, error) {
 	users, err := u.userRepo.FindByID(ctx, &infra.UserQuery{
 		ID: &infoDTO.UserID,

@@ -15,7 +15,6 @@ func register(r *gin.Engine) {
 	}
 	blogGroup := r.Group("/blog")
 	{
-
 		blogGroup.GET("/home/list",web.BlogWebHandler.HomeList)  // 查看首页帖子【基于滚动分页】
 		blogGroup.GET("/space/list",web.BlogWebHandler.SpaceList)  //获取某个用户发布的所有帖子【不分页】
 		blogGroup.GET("/info", web.BlogWebHandler.Info)  //获取某个帖子内容

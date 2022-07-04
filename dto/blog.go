@@ -1,6 +1,5 @@
 package dto
 
-
 // blog/info
 type BlogInfoRequestDTO struct {
 	BlogID int64
@@ -48,3 +47,4 @@ type BlogSpaceListResponseDTO struct {
 	Text       string `json:"text"`
 	Imgs       string `json:"imgs"`
 	Like       int64  `json:"like"`
+}

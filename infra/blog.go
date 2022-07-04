@@ -12,7 +12,6 @@ import (
 
 //数据库中存储的blog表结构
 type Blog struct {
-
 	BlogID          int64  `gorm:"primary_key"`
 	UserID          int64  `gorm:"column:user_id"`
 	Text            string `gorm:"column:text"`
@@ -51,7 +50,6 @@ func (b *BlogRepo) Save(ctx context.Context, blog *model.Blog) error {
 	return nil
 }
 
-
 //根据生成时间戳查询
 func (b *BlogRepo) FindByTimeStamp(ctx context.Context, blog *BlogQuery) ([]*model.Blog, error) {
 	blogDOs := []*Blog{}
@@ -77,7 +75,6 @@ func (b *BlogRepo) FindByTimeStamp(ctx context.Context, blog *BlogQuery) ([]*mod
 	}
 	return ans, nil
 }
-
 
 func (b *BlogRepo) Find(ctx context.Context, blog *BlogQuery) ([]*model.Blog, error) {
 	blogDOs := []*Blog{}
