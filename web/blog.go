@@ -31,8 +31,9 @@ func (u *blogWebHandler) HomeList(c *gin.Context) {
 
 //获取某个用户发布的所有帖子【不分页】  /space/list
 func (u *blogWebHandler) SpaceList(c *gin.Context) {
+	UID, _ := strconv.ParseInt(c.Param("UserID"), 10, 64)
 	dto := dto.BlogSpaceListRequestDTO{
-		UserID: c.GetInt64("UserID"),
+		UserID: UID,
 	}
 	resp, err := service.BlogService.SpaceList(c, &dto)
 	if err != nil {
