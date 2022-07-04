@@ -2,12 +2,10 @@ package service
 
 import (
 	"context"
-	"strconv"
 
 	"github.com/ininzzz/summer-backend/common"
 	"github.com/ininzzz/summer-backend/dto"
 	"github.com/ininzzz/summer-backend/infra"
-	"github.com/ininzzz/summer-backend/model"
 	"github.com/sirupsen/logrus"
 )
 
@@ -18,142 +16,81 @@ type blogService struct {
 	userRepo infra.UserRepo
 }
 
-func (u *blogService) List(ctx context.Context, blogListDTO *dto.BlogListRequestDTO) (*common.Response, error) {
-	userID, err := strconv.Atoi(blogListDTO.UserID)
-	if err != nil {
-		logrus.Errorf("[blogService List] err: %v", err.Error())
-		return common.NewResponseOfErr(err), err
-	}
-	userID64 := int64(userID)
-	blogs, err := u.blogRepo.Find(ctx, &infra.BlogQuery{
-		UserID: &userID64,
+// blog/home/list
+func (u *blogService) HomeList(ctx context.Context, reqDTO *dto.BlogHomeListRequestDTO) (*common.Response, error) {
+	//根据发送的时间戳查询固定条数(比如10条)的blog条
+	blogs, err := u.blogRepo.FindByTimeStamp(ctx, &infra.BlogQuery{ //此处查询本应返回最小时间戳填入下方LastTimeStamp
+		CreateTimeStamp: &reqDTO.LastTimeStamp,
 	})
 	if err != nil {
-		logrus.Errorf("[blogService List] err: %v", err.Error())
+		logrus.Errorf("[blogService BlogHomeList] err: %v", err.Error())
+
 		return common.NewResponseOfErr(err), err
 	}
-	data := []*dto.BlogListResponseDTO{}
+	//构造DTO中的BlogList
+	blog_data := []dto.HomeListBlog{}
 	for _, blog := range blogs {
-		data = append(data, &dto.BlogListResponseDTO{
-			ID:    blog.ID,
-			Title: blog.Title,
-			Like:  blog.Like,
+
+		//对每条blog获取其他相关信息，比如UserAvatar
+		user, _ := UserService.userRepo.FindByID(ctx, &infra.UserQuery{
+			ID: &blog.UserID,
+		})
+		blog_data = append(blog_data, dto.HomeListBlog{
+			BlogID:     blog.BlogID,
+			UserID:     blog.UserID,
+			UserAvatar: user[0].UserAvatar,
+			Text:       blog.Text,
+			//还没填完
+
+		})
+	}
+	//构造DTO
+	data := &dto.BlogHomeListResponseDTO{
+		//LastTimeStamp: xxx, //填入本次查询到的最小的时间戳
+		BlogList: blog_data,
+	}
+	return common.NewResponseOfSuccess(data), nil
+}
+
+// /blog/space 不分页
+func (u *blogService) SpaceList(ctx context.Context, reqDTO *dto.BlogSpaceListRequestDTO) (*common.Response, error) {
+	blogs, err := u.blogRepo.Find(ctx, &infra.BlogQuery{
+		UserID: &reqDTO.UserID,
+	})
+	if err != nil {
+		logrus.Errorf("[blogService SpaceList] err: %v", err.Error())
+		return common.NewResponseOfErr(err), err
+	}
+	data := []*dto.BlogSpaceListResponseDTO{}
+	for _, blog := range blogs {
+		user, _ := UserService.userRepo.FindByID(ctx, &infra.UserQuery{
+			ID: &blog.UserID,
+		})
+		data = append(data, &dto.BlogSpaceListResponseDTO{
+			BlogID:     blog.BlogID,
+			UserID:     blog.UserID,
+			UserAvatar: user[0].UserAvatar,
+			Text:       blog.Text,
+			//还没填完
 		})
 	}
 	return common.NewResponseOfSuccess(data), nil
 }
 
-func (u *blogService) ListAll(ctx context.Context, blogListAllDTO *dto.BlogListAllRequestDTO) (*common.Response, error) {
-	blogs, err := u.blogRepo.Find(ctx, &infra.BlogQuery{})
-	if err != nil {
-		logrus.Errorf("[blogService ListAll] err: %v", err.Error())
-		return common.NewResponseOfErr(err), err
-	}
-	data := []*dto.BlogListAllResponseDTO{}
-	for _, blog := range blogs {
-		data = append(data, &dto.BlogListAllResponseDTO{
-			ID:     blog.ID,
-			UserID: blog.UserID,
-			Title:  blog.Title,
-			Like:   blog.Like,
-		})
-	}
-	return common.NewResponseOfSuccess(data), nil
-}
+// /blog/info
+func (u *blogService) Info(ctx context.Context, reqDTO *dto.BlogInfoRequestDTO) (*common.Response, error) {
+	blogs, err := u.blogRepo.Find(ctx, &infra.BlogQuery{
+		BlogID: &reqDTO.BlogID,
+	})
 
-func (u *blogService) Info(ctx context.Context, blogInfoDTO *dto.BlogInfoRequestDTO) (*common.Response, error) {
-	blogID, err := strconv.Atoi(blogInfoDTO.BlogID)
-	if err != nil {
-		logrus.Errorf("[blogService Info] err: %v", err.Error())
-		return common.NewResponseOfErr(err), err
-	}
-	blog, err := u.blogRepo.FindByID(ctx, int64(blogID))
 	if err != nil {
 		logrus.Errorf("[blogService Info] err: %v", err.Error())
 		return common.NewResponseOfErr(err), err
 	}
 	data := &dto.BlogInfoResponseDTO{
-		Title: blog.Title,
-		Text:  blog.Text,
-		Like:  blog.Like,
-	}
-	return common.NewResponseOfSuccess(data), nil
-}
 
-func (u *blogService) Post(ctx context.Context, blogPostDTO *dto.BlogPostRequestDTO) (*common.Response, error) {
-	userID, err := strconv.Atoi(blogPostDTO.UserID)
-	if err != nil {
-		logrus.Errorf("[blogService Post] err: %v", err.Error())
-		return common.NewResponseOfErr(err), err
+		Text: blogs[0].Text,
+		//还没填完
 	}
-	err = u.blogRepo.Save(ctx, &model.Blog{
-		Title:  blogPostDTO.Title,
-		UserID: int64(userID),
-		Text:   blogPostDTO.Text,
-	})
-	if err != nil {
-		logrus.Errorf("[blogService Post] err: %v", err.Error())
-		return common.NewResponseOfErr(err), err
-	}
-	return common.NewResponseOfSuccess(nil), nil
-}
-
-func (u *blogService) Like(ctx context.Context, blogLikeDTO *dto.BlogLikeRequestDTO) (*common.Response, error) {
-	blog, err := u.blogRepo.FindByID(ctx, blogLikeDTO.BlogID)
-	if err != nil {
-		logrus.Errorf("[blogService Like] err: %v", err.Error())
-		return common.NewResponseOfErr(err), err
-	}
-	err = u.blogRepo.UpdateField(ctx, &model.Blog{
-		ID:   blogLikeDTO.BlogID,
-		Like: blog.Like + blogLikeDTO.Value,
-	})
-	if err != nil {
-		logrus.Errorf("[blogService Like] err: %v", err.Error())
-		return common.NewResponseOfErr(err), err
-	}
-	return common.NewResponseOfSuccess(nil), nil
-}
-
-func (u *blogService) Comment(ctx context.Context, blogCommentDTO *dto.BlogCommentPostRequestDTO) (*common.Response, error) {
-	userID, err := strconv.Atoi(blogCommentDTO.UserID)
-	if err != nil {
-		logrus.Errorf("[blogService Comment] err: %v", err.Error())
-		return common.NewResponseOfErr(err), err
-	}
-	user, err := u.userRepo.FindByID(ctx, int64(userID))
-	if err != nil {
-		logrus.Errorf("[blogService Comment] err: %v", err.Error())
-		return common.NewResponseOfErr(err), err
-	}
-	blog, err := u.blogRepo.FindByID(ctx, blogCommentDTO.BlogID)
-	if err != nil {
-		logrus.Errorf("[blogService Comment] err: %v", err.Error())
-		return common.NewResponseOfErr(err), err
-	}
-	blog.Comment = append(blog.Comment, dto.BlogCommentListResponseDTO{
-		Username: user.Username,
-		Comment:  blogCommentDTO.Comment,
-	})
-	err = u.blogRepo.Save(ctx, blog)
-	if err != nil {
-		logrus.Errorf("[blogService Comment] err: %v", err.Error())
-		return common.NewResponseOfErr(err), err
-	}
-	return common.NewResponseOfSuccess(nil), nil
-}
-
-func (u *blogService) CommentList(ctx context.Context, blogCommentListDTO *dto.BlogCommentListRequestDTO) (*common.Response, error) {
-	blogID, err := strconv.Atoi(blogCommentListDTO.BlogID)
-	if err != nil {
-		logrus.Errorf("[blogService CommentList] err: %v", err.Error())
-		return common.NewResponseOfErr(err), err
-	}
-	blog, err := u.blogRepo.FindByID(ctx, int64(blogID))
-	if err != nil {
-		logrus.Errorf("[blogService CommentList] err: %v", err.Error())
-		return common.NewResponseOfErr(err), err
-	}
-	data := blog.Comment
 	return common.NewResponseOfSuccess(data), nil
 }

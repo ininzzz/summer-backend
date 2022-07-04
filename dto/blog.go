@@ -1,73 +1,50 @@
 package dto
 
-// blog/all/list
-type BlogListAllRequestDTO struct {
-}
-
-type BlogListAllResponseDTO struct {
-	ID     int64 `json:"id"`
-	UserID int64
-	Title  string `json:"title"`
-	Like   int    `json:"like"`
-}
-
-// blog/list
-type BlogListRequestDTO struct {
-	UserID string `query:"user_id"`
-}
-
-type BlogListResponseDTO struct {
-	ID    int64  `json:"id"`
-	Title string `json:"title"`
-	Like  int    `json:"like"`
-}
-
 // blog/info
 type BlogInfoRequestDTO struct {
-	BlogID string `param:"blog_id"`
+	BlogID int64
 }
 
 type BlogInfoResponseDTO struct {
-	Title string `json:"title"`
-	Text  string `json:"text"`
-	Like  int    `json:"like"`
+	UserID     int64                        `json:"user_id"`
+	UserName   string                       `json:"user_name"`
+	UserAvatar string                       `json:"user_avatar"`
+	Text       string                       `json:"text"`
+	Imgs       string                       `json:"imgs"`
+	Like       int64                        `json:"like"`
+	Comments   []BlogCommentListResponseDTO `json:"comments"`
 }
 
-// blog/post
-type BlogPostRequestDTO struct {
-	UserID string
-	Title  string `json:"title"`
-	Text   string `json:"text"`
+// blog/home/list
+type BlogHomeListRequestDTO struct {
+	LastTimeStamp int64
 }
 
-type BlogPostResponseDTO struct {
+type HomeListBlog struct {
+	BlogID     int64  `json:"blog_id"`
+	UserID     int64  `json:"user_id"`
+	UserName   string `json:"user_name"`
+	UserAvatar string `json:"user_avatar"`
+	Text       string `json:"text"`
+	Imgs       string `json:"imgs"`
+	Like       int64  `json:"like"`
+}
+type BlogHomeListResponseDTO struct {
+	LastTimeStamp int64          `json:"lastTimeStamp"`
+	BlogList      []HomeListBlog `json:"blog_list"`
 }
 
-// blog/comment/post
-type BlogCommentPostRequestDTO struct {
-	UserID  string
-	BlogID  int64  `json:"blog_id"`
-	Comment string `json:"comment"`
+// blog/space/list
+type BlogSpaceListRequestDTO struct {
+	UserID int64
 }
 
-type BlogCommentPostResponseDTO struct {
-}
-
-// blog/comment/list
-type BlogCommentListRequestDTO struct {
-	BlogID string `query:"blog_id"`
-}
-
-type BlogCommentListResponseDTO struct {
-	Username string `json:"username"`
-	Comment  string `json:"comment"`
-}
-
-// blog/like
-type BlogLikeRequestDTO struct {
-	BlogID int64 `json:"blog_id"`
-	Value  int   `json:"value"`
-}
-
-type BlogLikeResponseDTO struct {
+type BlogSpaceListResponseDTO struct {
+	BlogID     int64  `json:"blog_id"`
+	UserID     int64  `json:"user_id"`
+	UserName   string `json:"user_name"`
+	UserAvatar string `json:"user_avatar"`
+	Text       string `json:"text"`
+	Imgs       string `json:"imgs"`
+	Like       int64  `json:"like"`
 }

@@ -61,3 +61,17 @@ func (u *userService) Info(ctx context.Context, infoDTO *dto.InfoRequestDTO) (*c
 	}
 	return common.NewResponseOfSuccess(data), nil
 }
+
+func (u *userService) FindInfoByID(ctx context.Context, infoDTO *dto.InfoRequestDTO) (*common.Response, error) {
+	users, err := u.userRepo.FindByID(ctx, &infra.UserQuery{
+		ID: &infoDTO.UserID,
+	})
+	if err != nil {
+		logrus.Errorf("[userService Info] err: %v", err.Error())
+		return common.NewResponseOfErr(err), err
+	}
+	data := &dto.InfoResponseDTO{
+		Username: users[0].Username,
+	}
+	return common.NewResponseOfSuccess(data), nil
+}

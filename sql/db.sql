@@ -16,4 +16,7 @@ create table `blog`(
     `like` int not null default 0,
     `comment` text,
     primary key(`id`)
+
+
 );
+
