@@ -6,6 +6,7 @@ import (
 	"github.com/ininzzz/summer-backend/common"
 	"github.com/ininzzz/summer-backend/dto"
 	"github.com/ininzzz/summer-backend/infra"
+	"github.com/ininzzz/summer-backend/model"
 	"github.com/sirupsen/logrus"
 )
 
@@ -13,7 +14,9 @@ var BlogService blogService
 
 type blogService struct {
 	blogRepo infra.BlogRepo
+	userRepo infra.UserRepo
 }
+
 
 // blog/home/list
 func (u *blogService) HomeList(ctx context.Context, reqDTO *dto.BlogHomeListRequestDTO) (*common.Response, error) {
@@ -23,11 +26,13 @@ func (u *blogService) HomeList(ctx context.Context, reqDTO *dto.BlogHomeListRequ
 	})
 	if err != nil {
 		logrus.Errorf("[blogService BlogHomeList] err: %v", err.Error())
+
 		return common.NewResponseOfErr(err), err
 	}
 	//构造DTO中的BlogList
 	blog_data := []dto.HomeListBlog{}
 	for _, blog := range blogs {
+
 		//对每条blog获取其他相关信息，比如UserAvatar
 		user, _ := UserService.userRepo.FindByID(ctx, &infra.UserQuery{
 			ID: &blog.UserID,
@@ -38,6 +43,7 @@ func (u *blogService) HomeList(ctx context.Context, reqDTO *dto.BlogHomeListRequ
 			UserAvatar: user[0].UserAvatar,
 			Text:       blog.Text,
 			//还没填完
+
 		})
 	}
 	//构造DTO
@@ -47,6 +53,7 @@ func (u *blogService) HomeList(ctx context.Context, reqDTO *dto.BlogHomeListRequ
 	}
 	return common.NewResponseOfSuccess(data), nil
 }
+
 
 // /blog/space 不分页
 func (u *blogService) SpaceList(ctx context.Context, reqDTO *dto.BlogSpaceListRequestDTO) (*common.Response, error) {
@@ -78,11 +85,13 @@ func (u *blogService) Info(ctx context.Context, reqDTO *dto.BlogInfoRequestDTO) 
 	blogs, err := u.blogRepo.Find(ctx, &infra.BlogQuery{
 		BlogID: &reqDTO.BlogID,
 	})
+
 	if err != nil {
-		logrus.Errorf("[blogService BlogInfo] err: %v", err.Error())
+		logrus.Errorf("[blogService Info] err: %v", err.Error())
 		return common.NewResponseOfErr(err), err
 	}
 	data := &dto.BlogInfoResponseDTO{
+
 		Text: blogs[0].Text,
 		//还没填完
 	}
