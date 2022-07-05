@@ -2,9 +2,7 @@ package infra
 
 import (
 	"context"
-	"encoding/json"
 
-	"github.com/ininzzz/summer-backend/dto"
 	"github.com/ininzzz/summer-backend/model"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -111,30 +109,23 @@ func (b *BlogRepo) UpdateField(ctx context.Context, blog *model.Blog) error {
 }
 
 func (b *BlogRepo) toDO(blog *model.Blog) (*Blog, error) {
-	str, err := json.Marshal(blog.Comment)
-	if err != nil {
-		return nil, err
-	}
 	return &Blog{
-		ID:      blog.ID,
-		Text:    blog.Text,
-		UserID:  blog.UserID,
-		Like:    blog.Like,
-		Comment: string(str),
+		BlogID:          blog.BlogID,
+		UserID:          blog.UserID,
+		Text:            blog.Text,
+		Imgs:            blog.Imgs,
+		CreateTimestamp: blog.CreateTimestamp,
+		ModifyTimestamp: blog.ModifyTimestamp,
 	}, nil
 }
 
 func (b *BlogRepo) toModel(blog *Blog) (*model.Blog, error) {
-	comment := []dto.BlogCommentListResponseDTO{}
-	err := json.Unmarshal([]byte(blog.Comment), &comment)
-	if err != nil {
-		return nil, err
-	}
 	return &model.Blog{
-		ID:      blog.ID,
-		Text:    blog.Text,
-		UserID:  blog.UserID,
-		Like:    blog.Like,
-		Comment: comment,
+		BlogID:          blog.BlogID,
+		Text:            blog.Text,
+		UserID:          blog.UserID,
+		Imgs:            blog.Imgs,
+		CreateTimestamp: blog.CreateTimestamp,
+		ModifyTimestamp: blog.ModifyTimestamp,
 	}, nil
 }
