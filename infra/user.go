@@ -9,7 +9,7 @@ import (
 )
 
 type User struct {
-	ID         int64  `gorm:"primary_key"`
+	ID         int64  `gorm:"column:user_id;primary_key"`
 	Username   string `gorm:"column:username"`
 	Password   string `gorm:"column:password"`
 	UserAvatar string `gorm:"column:user_avatar"`
@@ -44,13 +44,13 @@ func (u *UserRepo) Save(ctx context.Context, user *model.User) error {
 }
 
 func (u *UserRepo) FindByID(ctx context.Context, user *UserQuery) (*model.User, error) {
-	userDO := &User{}
+	userDO := User{}
 	err := db.Where("user_id = ?", user.ID).Find(&userDO).Error
 	if err != nil {
 		return nil, err
 	}
 	fmt.Printf("userDO: %v\n", userDO)
-	res, err := u.toModel(userDO)
+	res, err := u.toModel(&userDO)
 	fmt.Printf("res: %v\n", res)
 	if err != nil {
 		return nil, err
@@ -60,6 +60,9 @@ func (u *UserRepo) FindByID(ctx context.Context, user *UserQuery) (*model.User, 
 
 func (u *UserRepo) Find(ctx context.Context, user *UserQuery) ([]*model.User, error) {
 	userDOs := []*User{}
+	if user.ID != nil {
+		db = db.Where("user_id = ?", user.ID)
+	}
 	if user.Username != nil {
 		db = db.Where("username = ?", user.Username)
 	}

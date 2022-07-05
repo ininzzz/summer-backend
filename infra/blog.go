@@ -10,7 +10,7 @@ import (
 
 //数据库中存储的blog表结构
 type Blog struct {
-	BlogID          int64  `gorm:"primary_key"`
+	BlogID          int64  `gorm:"column:blog_id;primary_key"`
 	UserID          int64  `gorm:"column:user_id"`
 	Text            string `gorm:"column:text"`
 	Imgs            string `gorm:"column:imgs"`
@@ -36,7 +36,7 @@ func (b *BlogRepo) Save(ctx context.Context, blog *model.Blog) error {
 		logrus.Errorf("[BlogRepo Save] err: %v", err.Error())
 		return err
 	}
-	err = db.Where("id = ?", BlogDO.BlogID).Error
+	err = db.Where("blog_id = ?", BlogDO.BlogID).Error
 	if err == gorm.ErrRecordNotFound {
 		err = db.Create(BlogDO).Error
 	} else if err == nil {
