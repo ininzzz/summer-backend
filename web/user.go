@@ -2,6 +2,7 @@ package web
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/ininzzz/summer-backend/common"
@@ -32,10 +33,11 @@ func (u *userWebHandler) Login(c *gin.Context) {
 }
 
 func (u *userWebHandler) Info(c *gin.Context) {
+	user_id, _ := strconv.ParseInt(c.Query("user_id"), 10, 64)
 	dto := dto.InfoRequestDTO{
-		UserID: c.Query("user_id"),
+		UserID: user_id,
 	}
-	resp, err := service.UserService.Info(c, &dto)
+	resp, err := service.UserService.FindInfoByID(c, &dto)
 	if err != nil {
 		logrus.Errorf("[userWebHandler Info] err: %v", err.Error())
 		c.JSON(http.StatusBadRequest, resp)

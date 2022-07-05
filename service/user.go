@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"fmt"
-	"strconv"
 
 	"github.com/ininzzz/summer-backend/common"
 	"github.com/ininzzz/summer-backend/dto"
@@ -42,13 +41,31 @@ func (u *userService) Login(ctx context.Context, loginDTO *dto.LoginRequestDTO) 
 	return common.NewResponseOfSuccess(data), nil
 }
 
-func (u *userService) Info(ctx context.Context, infoDTO *dto.InfoRequestDTO) (*common.Response, error) {
-	userID, err := strconv.Atoi(infoDTO.UserID)
-	if err != nil {
-		logrus.Errorf("[blogService BlogInfo] err: %v", err.Error())
-		return common.NewResponseOfErr(err), err
-	}
-	user, err := u.userRepo.FindByID(ctx, int64(userID))
+// func (u *userService) Info(ctx context.Context, infoDTO *dto.InfoRequestDTO) (*common.Response, error) {
+// 	// userID, err := strconv.Atoi(infoDTO.UserID)
+// 	// if err != nil {
+// 	// 	logrus.Errorf("[blogService BlogInfo] err: %v", err.Error())
+// 	// 	return common.NewResponseOfErr(err), err
+// 	// }
+// 	user, err := u.userRepo.FindByID(ctx, &infra.UserQuery{
+// 		ID: &infoDTO.UserID,
+// 	})
+// 	if err != nil {
+// 		logrus.Errorf("[userService Info] err: %v", err.Error())
+// 		return common.NewResponseOfErr(err), err
+// 	}
+// 	data := &dto.InfoResponseDTO{
+// 		Username: user.Username,
+// 		Gender:   user.Gender,
+// 		Email:    user.Email,
+// 	}
+// 	return common.NewResponseOfSuccess(data), nil
+// }
+
+func (u *userService) FindInfoByID(ctx context.Context, infoDTO *dto.InfoRequestDTO) (*common.Response, error) {
+	user, err := u.userRepo.FindByID(ctx, &infra.UserQuery{
+		ID: &infoDTO.UserID,
+	})
 	if err != nil {
 		logrus.Errorf("[userService Info] err: %v", err.Error())
 		return common.NewResponseOfErr(err), err
@@ -57,21 +74,7 @@ func (u *userService) Info(ctx context.Context, infoDTO *dto.InfoRequestDTO) (*c
 		Username: user.Username,
 		Gender:   user.Gender,
 		Email:    user.Email,
-		Icon:     string(user.Icon),
-	}
-	return common.NewResponseOfSuccess(data), nil
-}
-
-func (u *userService) FindInfoByID(ctx context.Context, infoDTO *dto.InfoRequestDTO) (*common.Response, error) {
-	users, err := u.userRepo.FindByID(ctx, &infra.UserQuery{
-		ID: &infoDTO.UserID,
-	})
-	if err != nil {
-		logrus.Errorf("[userService Info] err: %v", err.Error())
-		return common.NewResponseOfErr(err), err
-	}
-	data := &dto.InfoResponseDTO{
-		Username: users[0].Username,
+		Avatar:   user.UserAvatar,
 	}
 	return common.NewResponseOfSuccess(data), nil
 }

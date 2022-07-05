@@ -43,18 +43,17 @@ func (u *UserRepo) Save(ctx context.Context, user *model.User) error {
 	return nil
 }
 
-func (u *UserRepo) FindByID(ctx context.Context, id int64) (*model.User, error) {
+func (u *UserRepo) FindByID(ctx context.Context, user *UserQuery) (*model.User, error) {
 	userDO := &User{}
-	err := db.Where("id = ?", id).Find(&userDO).Error
+	err := db.Where("id = ?", user.ID).Find(&userDO).Error
 	if err != nil {
 		return nil, err
 	}
-	user, err := u.toModel(userDO)
+	res, err := u.toModel(userDO)
 	if err != nil {
 		return nil, err
 	}
-	return user, nil
-
+	return res, nil
 }
 
 func (u *UserRepo) Find(ctx context.Context, user *UserQuery) ([]*model.User, error) {

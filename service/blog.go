@@ -24,13 +24,11 @@ func (u *blogService) HomeList(ctx context.Context, reqDTO *dto.BlogHomeListRequ
 	})
 	if err != nil {
 		logrus.Errorf("[blogService BlogHomeList] err: %v", err.Error())
-
 		return common.NewResponseOfErr(err), err
 	}
 	//构造DTO中的BlogList
 	blog_data := []dto.HomeListBlog{}
 	for _, blog := range blogs {
-
 		//对每条blog获取其他相关信息，比如UserAvatar
 		user, _ := UserService.userRepo.FindByID(ctx, &infra.UserQuery{
 			ID: &blog.UserID,
@@ -38,7 +36,7 @@ func (u *blogService) HomeList(ctx context.Context, reqDTO *dto.BlogHomeListRequ
 		blog_data = append(blog_data, dto.HomeListBlog{
 			BlogID:     blog.BlogID,
 			UserID:     blog.UserID,
-			UserAvatar: user[0].UserAvatar,
+			UserAvatar: user.UserAvatar,
 			Text:       blog.Text,
 			//还没填完
 
@@ -69,7 +67,7 @@ func (u *blogService) SpaceList(ctx context.Context, reqDTO *dto.BlogSpaceListRe
 		data = append(data, &dto.BlogSpaceListResponseDTO{
 			BlogID:     blog.BlogID,
 			UserID:     blog.UserID,
-			UserAvatar: user[0].UserAvatar,
+			UserAvatar: user.UserAvatar,
 			Text:       blog.Text,
 			//还没填完
 		})
