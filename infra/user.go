@@ -27,6 +27,7 @@ type UserRepo struct {
 }
 
 func (u *UserRepo) Save(ctx context.Context, user *model.User) error {
+	db := GetDB(ctx)
 	userDO, err := u.toDO(user)
 	if err != nil {
 		return err
@@ -44,6 +45,7 @@ func (u *UserRepo) Save(ctx context.Context, user *model.User) error {
 }
 
 func (u *UserRepo) FindByID(ctx context.Context, user *UserQuery) (*model.User, error) {
+	db := GetDB(ctx)
 	userDO := User{}
 	err := db.Where("user_id = ?", user.ID).Find(&userDO).Error
 	if err != nil {
@@ -59,6 +61,7 @@ func (u *UserRepo) FindByID(ctx context.Context, user *UserQuery) (*model.User, 
 }
 
 func (u *UserRepo) Find(ctx context.Context, user *UserQuery) ([]*model.User, error) {
+	db := GetDB(ctx)
 	userDOs := []*User{}
 	if user.ID != nil {
 		db = db.Where("user_id = ?", user.ID)

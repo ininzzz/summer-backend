@@ -31,6 +31,7 @@ type BlogRepo struct {
 
 //转换model中的blog类型为数据库中的Blog，存储之
 func (b *BlogRepo) Save(ctx context.Context, blog *model.Blog) error {
+	db := GetDB(ctx)
 	BlogDO, err := b.toDO(blog)
 	if err != nil {
 		logrus.Errorf("[BlogRepo Save] err: %v", err.Error())
@@ -51,6 +52,7 @@ func (b *BlogRepo) Save(ctx context.Context, blog *model.Blog) error {
 
 //根据生成时间戳查询
 func (b *BlogRepo) FindByTimeStamp(ctx context.Context, blog *BlogQuery) ([]*model.Blog, error) {
+	db := GetDB(ctx)
 	blogDOs := []*Blog{}
 	if blog.CreateTimeStamp != nil {
 		//需要查询固定条数的比blog.CreateTimeStamp小的blog（且在满足条件的blog中有最大的时间戳），并跳过上次查询与最小时间戳相同的offset条blog，使用小于等于号检索（create_time_stamp <= ?）
@@ -76,6 +78,7 @@ func (b *BlogRepo) FindByTimeStamp(ctx context.Context, blog *BlogQuery) ([]*mod
 }
 
 func (b *BlogRepo) Find(ctx context.Context, blog *BlogQuery) ([]*model.Blog, error) {
+	db := GetDB(ctx)
 	blogDOs := []*Blog{}
 	if blog.BlogID != nil {
 		db = db.Where("blog_id = ?", blog.BlogID)
@@ -101,6 +104,7 @@ func (b *BlogRepo) Find(ctx context.Context, blog *BlogQuery) ([]*model.Blog, er
 }
 
 func (b *BlogRepo) UpdateField(ctx context.Context, blog *model.Blog) error {
+	db := GetDB(ctx)
 	err := db.Model(&blog).Updates(blog).Error
 	if err != nil {
 		logrus.Errorf("[BlogRepo UpdateField] err: %v", err.Error())

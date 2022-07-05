@@ -27,6 +27,7 @@ type CommentRepo struct {
 }
 
 func (repo *CommentRepo) Save(ctx context.Context, cmt *model.Comment) error {
+	db := GetDB(ctx)
 	CmtDO, err := repo.toDO(cmt)
 	if err != nil {
 		logrus.Errorf("[CommentRepo Save] err: %v", err.Error())
@@ -47,6 +48,7 @@ func (repo *CommentRepo) Save(ctx context.Context, cmt *model.Comment) error {
 
 //根据BlogQuery中的参数查询,返回model类型的blog
 func (repo *CommentRepo) Find(ctx context.Context, cmt *CommentQuery) ([]*model.Comment, error) {
+	db := GetDB(ctx)
 	commentDOs := []*Comment{}
 	if cmt.BlogID != nil {
 		db = db.Where("blog_id = ?", cmt.BlogID)
