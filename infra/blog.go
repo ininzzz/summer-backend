@@ -16,6 +16,7 @@ type Blog struct {
 	Imgs            string `gorm:"column:imgs"`
 	CreateTimestamp int64  `gorm:"column:create_time_stamp"`
 	ModifyTimestamp int64  `gorm:"column:modify_time_stamp"`
+	Like            int    `gorm:"column:like"`
 }
 
 //查询用
@@ -77,7 +78,7 @@ func (b *BlogRepo) FindByTimeStamp(ctx context.Context, blog *BlogQuery) ([]*mod
 func (b *BlogRepo) Find(ctx context.Context, blog *BlogQuery) ([]*model.Blog, error) {
 	blogDOs := []*Blog{}
 	if blog.BlogID != nil {
-		db = db.Where("id = ?", blog.BlogID)
+		db = db.Where("blog_id = ?", blog.BlogID)
 	}
 	if blog.UserID != nil {
 		db = db.Where("user_id = ?", blog.UserID)

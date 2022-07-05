@@ -2,6 +2,7 @@ package infra
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/ininzzz/summer-backend/model"
 	"gorm.io/gorm"
@@ -14,7 +15,6 @@ type User struct {
 	UserAvatar string `gorm:"column:user_avatar"`
 	Gender     int    `gorm:"column:gender"`
 	Email      string `gorm:"column:email"`
-	Nickname   string `gorm:"column:nick_name"`
 }
 
 type UserQuery struct {
@@ -31,7 +31,7 @@ func (u *UserRepo) Save(ctx context.Context, user *model.User) error {
 	if err != nil {
 		return err
 	}
-	err = db.Where("id = ?", userDO.ID).Error
+	err = db.Where("user_id = ?", userDO.ID).Error
 	if err == gorm.ErrRecordNotFound {
 		err = db.Create(userDO).Error
 	} else if err == nil {
@@ -45,11 +45,13 @@ func (u *UserRepo) Save(ctx context.Context, user *model.User) error {
 
 func (u *UserRepo) FindByID(ctx context.Context, user *UserQuery) (*model.User, error) {
 	userDO := &User{}
-	err := db.Where("id = ?", user.ID).Find(&userDO).Error
+	err := db.Where("user_id = ?", user.ID).Find(&userDO).Error
 	if err != nil {
 		return nil, err
 	}
+	fmt.Printf("userDO: %v\n", userDO)
 	res, err := u.toModel(userDO)
+	fmt.Printf("res: %v\n", res)
 	if err != nil {
 		return nil, err
 	}

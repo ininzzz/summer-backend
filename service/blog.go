@@ -85,10 +85,16 @@ func (u *blogService) Info(ctx context.Context, reqDTO *dto.BlogInfoRequestDTO) 
 		logrus.Errorf("[blogService Info] err: %v", err.Error())
 		return common.NewResponseOfErr(err), err
 	}
+	user, _ := UserService.userRepo.FindByID(ctx, &infra.UserQuery{
+		ID: &blogs[0].UserID,
+	})
 	data := &dto.BlogInfoResponseDTO{
-
-		Text: blogs[0].Text,
-		//还没填完
+		UserID:     blogs[0].UserID,
+		UserName:   user.Username,
+		UserAvatar: user.UserAvatar,
+		Imgs:       blogs[0].Imgs,
+		Text:       blogs[0].Text,
+		Like:       blogs[0].Like,
 	}
 	return common.NewResponseOfSuccess(data), nil
 }

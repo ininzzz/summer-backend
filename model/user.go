@@ -5,6 +5,6 @@ type User struct {
 	Username   string
 	Password   string
 	UserAvatar string
-	Gender   string
-	Email    string
+	Gender     string
+	Email      string
 }
