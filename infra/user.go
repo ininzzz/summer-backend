@@ -15,7 +15,6 @@ type User struct {
 	Gender     int    `gorm:"column:gender"`
 	Email      string `gorm:"column:email"`
 	Nickname   string `gorm:"column:nick_name"`
-
 }
 
 type UserQuery struct {
@@ -43,7 +42,6 @@ func (u *UserRepo) Save(ctx context.Context, user *model.User) error {
 	}
 	return nil
 }
-
 
 func (u *UserRepo) FindByID(ctx context.Context, id int64) (*model.User, error) {
 	userDO := &User{}
@@ -92,9 +90,8 @@ func (u *UserRepo) toDO(user *model.User) (*User, error) {
 		Username:   user.Username,
 		Password:   user.Password,
 		UserAvatar: user.UserAvatar,
-		Gender:   gender,
-		Email:    user.Email,
-		Icon:     string(user.Icon),
+		Gender:     gender,
+		Email:      user.Email,
 	}, nil
 }
 
@@ -110,8 +107,7 @@ func (u *UserRepo) toModel(user *User) (*model.User, error) {
 		Username:   user.Username,
 		Password:   user.Password,
 		UserAvatar: user.UserAvatar,
-		Gender:   gender,
-		Email:    user.Email,
-		Icon:     []byte(user.Email),
+		Gender:     gender,
+		Email:      user.Email,
 	}, nil
 }
