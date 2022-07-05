@@ -58,12 +58,11 @@ func (b *BlogRepo) FindByTimeStamp(ctx context.Context, blog *BlogQuery) ([]*mod
 		//需要查询固定条数的比blog.CreateTimeStamp小的blog（且在满足条件的blog中有最大的时间戳），并跳过上次查询与最小时间戳相同的offset条blog，使用小于等于号检索（create_time_stamp <= ?）
 		//逻辑：上次看到的最后一条blog的时间戳是blog.CreateTimeStamp,且与这条时间戳相同的有offset条，需要跳过这几条
 		//简化后的逻辑：不考虑有两条blog拥有同样的时间戳，不需要考虑offset参数，使用小于号检索
-		db = db.Where("create_time_stamp < ?", blog.CreateTimeStamp) //此处仅举个例子，具体用法我不太清楚
-	}
-	err := db.Find(&blogDOs).Error
-	if err != nil {
-		logrus.Errorf("[BlogRepo Find] err: %v", err.Error())
-		return nil, err
+		err := db.Where("create_time_stamp < ?", blog.CreateTimeStamp).Find(&blogDOs).Error //此处仅举个例子，具体用法我不太清楚
+		if err != nil {
+			logrus.Errorf("[BlogRepo Find] err: %v", err.Error())
+			return nil, err
+		}
 	}
 	ans := []*model.Blog{}
 	for _, blogDO := range blogDOs {
@@ -77,19 +76,37 @@ func (b *BlogRepo) FindByTimeStamp(ctx context.Context, blog *BlogQuery) ([]*mod
 	return ans, nil
 }
 
-func (b *BlogRepo) Find(ctx context.Context, blog *BlogQuery) ([]*model.Blog, error) {
+func (b *BlogRepo) FindByUserID(ctx context.Context, blog *BlogQuery) ([]*model.Blog, error) {
+	db := GetDB(ctx)
+	blogDOs := []*Blog{}
+	if blog.UserID != nil {
+		err := db.Where("user_id = ?", blog.UserID).Find(&blogDOs).Error
+		if err != nil {
+			logrus.Errorf("[BlogRepo Find] err: %v", err.Error())
+			return nil, err
+		}
+	}
+	ans := []*model.Blog{}
+	for _, blogDO := range blogDOs {
+		blog, err := b.toModel(blogDO)
+		if err != nil {
+			logrus.Errorf("[BlogRepo Find] err: %v", err.Error())
+			return nil, err
+		}
+		ans = append(ans, blog)
+	}
+	return ans, nil
+}
+
+func (b *BlogRepo) FindByBlogID(ctx context.Context, blog *BlogQuery) ([]*model.Blog, error) {
 	db := GetDB(ctx)
 	blogDOs := []*Blog{}
 	if blog.BlogID != nil {
-		db = db.Where("blog_id = ?", blog.BlogID)
-	}
-	if blog.UserID != nil {
-		db = db.Where("user_id = ?", blog.UserID)
-	}
-	err := db.Find(&blogDOs).Error
-	if err != nil {
-		logrus.Errorf("[BlogRepo Find] err: %v", err.Error())
-		return nil, err
+		err := db.Where("blog_id = ?", blog.BlogID).Find(&blogDOs).Error
+		if err != nil {
+			logrus.Errorf("[BlogRepo Find] err: %v", err.Error())
+			return nil, err
+		}
 	}
 	ans := []*model.Blog{}
 	for _, blogDO := range blogDOs {

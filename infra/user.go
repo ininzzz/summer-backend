@@ -2,7 +2,6 @@ package infra
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/ininzzz/summer-backend/model"
 	"gorm.io/gorm"
@@ -51,9 +50,7 @@ func (u *UserRepo) FindByID(ctx context.Context, user *UserQuery) (*model.User, 
 	if err != nil {
 		return nil, err
 	}
-	fmt.Printf("userDO: %v\n", userDO)
 	res, err := u.toModel(&userDO)
-	fmt.Printf("res: %v\n", res)
 	if err != nil {
 		return nil, err
 	}
@@ -74,6 +71,7 @@ func (u *UserRepo) Find(ctx context.Context, user *UserQuery) ([]*model.User, er
 	}
 	err := db.Find(&userDOs).Error
 	if err != nil {
+		
 		return nil, err
 	}
 	ans := []*model.User{}
