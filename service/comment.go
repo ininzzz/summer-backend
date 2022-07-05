@@ -32,8 +32,8 @@ func (u *commentService) CommentList(ctx context.Context, reqDTO *dto.BlogCommen
 		data = append(data, &dto.BlogCommentListResponseDTO{
 			Text:       comment.Text,
 			UserID:     comment.UserID,
-			UserName:   user[0].Username,
-			UserAvatar: user[0].UserAvatar,
+			UserName:   user.Username,
+			UserAvatar: user.UserAvatar,
 		})
 	}
 	return common.NewResponseOfSuccess(data), nil

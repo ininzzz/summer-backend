@@ -1,7 +1,10 @@
 package model
 
 type Comment struct {
-	BlogID int64
-	UserID int64
-	Text   string
+	CommentID       int64
+	BlogID          int64
+	UserID          int64
+	Text            string
+	CreateTimeStamp int64
+	ModifyTimeStamp int64
 }

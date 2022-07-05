@@ -11,7 +11,7 @@ type BlogInfoResponseDTO struct {
 	UserAvatar string                       `json:"user_avatar"`
 	Text       string                       `json:"text"`
 	Imgs       string                       `json:"imgs"`
-	Like       int64                        `json:"like"`
+	Like       int                          `json:"like"`
 	Comments   []BlogCommentListResponseDTO `json:"comments"`
 }
 
@@ -27,7 +27,7 @@ type HomeListBlog struct {
 	UserAvatar string `json:"user_avatar"`
 	Text       string `json:"text"`
 	Imgs       string `json:"imgs"`
-	Like       int64  `json:"like"`
+	Like       int    `json:"like"`
 }
 type BlogHomeListResponseDTO struct {
 	LastTimeStamp int64          `json:"lastTimeStamp"`
@@ -46,5 +46,5 @@ type BlogSpaceListResponseDTO struct {
 	UserAvatar string `json:"user_avatar"`
 	Text       string `json:"text"`
 	Imgs       string `json:"imgs"`
-	Like       int64  `json:"like"`
+	Like       int    `json:"like"`
 }

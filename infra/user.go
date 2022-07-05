@@ -8,15 +8,12 @@ import (
 )
 
 type User struct {
-
-	ID         int64  `gorm:"primary_key"`
+	ID         int64  `gorm:"column:user_id;primary_key"`
 	Username   string `gorm:"column:username"`
 	Password   string `gorm:"column:password"`
 	UserAvatar string `gorm:"column:user_avatar"`
 	Gender     int    `gorm:"column:gender"`
 	Email      string `gorm:"column:email"`
-	Nickname   string `gorm:"column:nick_name"`
-
 }
 
 type UserQuery struct {
@@ -29,11 +26,12 @@ type UserRepo struct {
 }
 
 func (u *UserRepo) Save(ctx context.Context, user *model.User) error {
+	db := GetDB(ctx)
 	userDO, err := u.toDO(user)
 	if err != nil {
 		return err
 	}
-	err = db.Where("id = ?", userDO.ID).Error
+	err = db.Where("user_id = ?", userDO.ID).Error
 	if err == gorm.ErrRecordNotFound {
 		err = db.Create(userDO).Error
 	} else if err == nil {
@@ -45,23 +43,26 @@ func (u *UserRepo) Save(ctx context.Context, user *model.User) error {
 	return nil
 }
 
-
-func (u *UserRepo) FindByID(ctx context.Context, id int64) (*model.User, error) {
-	userDO := &User{}
-	err := db.Where("id = ?", id).Find(&userDO).Error
+func (u *UserRepo) FindByID(ctx context.Context, user *UserQuery) (*model.User, error) {
+	db := GetDB(ctx)
+	userDO := User{}
+	err := db.Where("user_id = ?", user.ID).Find(&userDO).Error
 	if err != nil {
 		return nil, err
 	}
-	user, err := u.toModel(userDO)
+	res, err := u.toModel(&userDO)
 	if err != nil {
 		return nil, err
 	}
-	return user, nil
-
+	return res, nil
 }
 
 func (u *UserRepo) Find(ctx context.Context, user *UserQuery) ([]*model.User, error) {
+	db := GetDB(ctx)
 	userDOs := []*User{}
+	if user.ID != nil {
+		db = db.Where("user_id = ?", user.ID)
+	}
 	if user.Username != nil {
 		db = db.Where("username = ?", user.Username)
 	}
@@ -70,6 +71,7 @@ func (u *UserRepo) Find(ctx context.Context, user *UserQuery) ([]*model.User, er
 	}
 	err := db.Find(&userDOs).Error
 	if err != nil {
+		
 		return nil, err
 	}
 	ans := []*model.User{}
@@ -93,9 +95,8 @@ func (u *UserRepo) toDO(user *model.User) (*User, error) {
 		Username:   user.Username,
 		Password:   user.Password,
 		UserAvatar: user.UserAvatar,
-		Gender:   gender,
-		Email:    user.Email,
-		Icon:     string(user.Icon),
+		Gender:     gender,
+		Email:      user.Email,
 	}, nil
 }
 
@@ -111,8 +112,7 @@ func (u *UserRepo) toModel(user *User) (*model.User, error) {
 		Username:   user.Username,
 		Password:   user.Password,
 		UserAvatar: user.UserAvatar,
-		Gender:   gender,
-		Email:    user.Email,
-		Icon:     []byte(user.Email),
+		Gender:     gender,
+		Email:      user.Email,
 	}, nil
 }

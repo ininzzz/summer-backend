@@ -10,11 +10,12 @@ import (
 
 //数据库中存储的blog表结构
 type Comment struct {
-	BlogID          int64  `gorm:"primary_key"`
+	CommentID       int64  `gorm:"primary_key"`
+	BlogID          int64  `gorm:"column:blog_id"`
 	UserID          int64  `gorm:"column:user_id"`
 	Text            string `gorm:"column:text"`
-	CreateTimestamp int64  `gorm:"column:create_time_stamp"`
-	ModifyTimestamp int64  `gorm:"column:modify_time_stamp"`
+	CreateTimeStamp int64  `gorm:"column:create_time_stamp"`
+	ModifyTimeStamp int64  `gorm:"column:modify_time_stamp"`
 }
 
 //查询用
@@ -25,14 +26,14 @@ type CommentQuery struct {
 type CommentRepo struct {
 }
 
-//转换model中的blog类型为数据库中的Blog，存储之
 func (repo *CommentRepo) Save(ctx context.Context, cmt *model.Comment) error {
+	db := GetDB(ctx)
 	CmtDO, err := repo.toDO(cmt)
 	if err != nil {
 		logrus.Errorf("[CommentRepo Save] err: %v", err.Error())
 		return err
 	}
-	err = db.Where("id = ?", CmtDO.BlogID).Error
+	err = db.Where("blog_id = ?", CmtDO.BlogID).Error
 	if err == gorm.ErrRecordNotFound {
 		err = db.Create(CmtDO).Error
 	} else if err == nil {
@@ -47,9 +48,10 @@ func (repo *CommentRepo) Save(ctx context.Context, cmt *model.Comment) error {
 
 //根据BlogQuery中的参数查询,返回model类型的blog
 func (repo *CommentRepo) Find(ctx context.Context, cmt *CommentQuery) ([]*model.Comment, error) {
+	db := GetDB(ctx)
 	commentDOs := []*Comment{}
 	if cmt.BlogID != nil {
-		db = db.Where("id = ?", cmt.BlogID)
+		db = db.Where("blog_id = ?", cmt.BlogID)
 	}
 	err := db.Find(&commentDOs).Error
 	if err != nil {
@@ -70,16 +72,22 @@ func (repo *CommentRepo) Find(ctx context.Context, cmt *CommentQuery) ([]*model.
 
 func (repo *CommentRepo) toDO(cmt *model.Comment) (*Comment, error) {
 	return &Comment{
-		BlogID: cmt.BlogID,
-		Text:   cmt.Text,
-		UserID: cmt.UserID,
+		CommentID:       cmt.CommentID,
+		BlogID:          cmt.BlogID,
+		Text:            cmt.Text,
+		UserID:          cmt.UserID,
+		CreateTimeStamp: cmt.CreateTimeStamp,
+		ModifyTimeStamp: cmt.ModifyTimeStamp,
 	}, nil
 }
 
 func (repo *CommentRepo) toModel(cmt *Comment) (*model.Comment, error) {
 	return &model.Comment{
-		BlogID: cmt.BlogID,
-		Text:   cmt.Text,
-		UserID: cmt.UserID,
+		CommentID:       cmt.CommentID,
+		BlogID:          cmt.BlogID,
+		Text:            cmt.Text,
+		UserID:          cmt.UserID,
+		CreateTimeStamp: cmt.CreateTimeStamp,
+		ModifyTimeStamp: cmt.ModifyTimeStamp,
 	}, nil
 }

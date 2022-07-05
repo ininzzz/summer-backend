@@ -5,6 +5,7 @@ type Blog struct {
 	UserID          int64
 	Text            string
 	Imgs            string
+	Like            int
 	CreateTimestamp int64
 	ModifyTimestamp int64
 }

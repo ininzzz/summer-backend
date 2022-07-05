@@ -13,12 +13,12 @@ type LoginResponseDTO struct {
 
 // user/info
 type InfoRequestDTO struct {
-	UserID string
+	UserID int64
 }
 
 type InfoResponseDTO struct {
-	Username string `json:"username"`
-	Gender   string `json:"gender"`
-	Email    string `json:"email"`
-	Icon     string `json:"icon"`
+	Username string `json:"user_name"`
+	Gender   string `json:"user_gender"`
+	Email    string `json:"user_email"`
+	Avatar   string `json:"user_avatar"`
 }

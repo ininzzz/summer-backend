@@ -2,11 +2,43 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/ininzzz/summer-backend/cache"
+	"github.com/ininzzz/summer-backend/tasks"
+	"github.com/ininzzz/summer-backend/utils"
+	"github.com/ininzzz/summer-backend/web"
+	"github.com/joho/godotenv"
 )
 
+// Init 初始化配置项
+func InitConf() {
+	// 从本地读取环境变量 .env文件
+	godotenv.Load()
+	// 连接Redis数据库
+	cache.InitRedis()
+	// 启动定时任务
+	tasks.CronJob()
+}
+
+func Register(r *gin.Engine) {
+	userGroup := r.Group("/user")
+	{
+		userGroup.POST("/login", web.UserWebHandler.Login)
+		userGroup.Use(utils.JwtAuth) //需要登录的路由
+		{
+			userGroup.GET("/info", web.UserWebHandler.Info)
+		}
+	}
+	blogGroup := r.Group("/blog")
+	{
+		blogGroup.GET("/home/list", web.BlogWebHandler.HomeList)       // 查看首页帖子【基于滚动分页】
+		blogGroup.GET("/space/list", web.BlogWebHandler.SpaceList)     //获取某个用户发布的所有帖子【不分页】
+		blogGroup.GET("/info", web.BlogWebHandler.Info)                //获取某个帖子内容
+		blogGroup.GET("/comment/list", web.BlogWebHandler.CommentList) //获取某个帖子的所有评论信息
+	}
+}
 func main() {
-	InitConfigure()
+	InitConf()
 	r := gin.Default()
-	register(r)
-	r.Run()
+	Register(r)
+	r.Run("127.0.0.1:9090")
 }
