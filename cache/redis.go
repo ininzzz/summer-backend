@@ -37,7 +37,7 @@ const (
 	TestHSetKey = "TestHSetKey"
 	BlogKP      = "blog:"       //blog:id  //HMSet，存的是一个blog的全部信息
 	JwtKP       = "Jwt:"        //Jwt:jwt  //HMSet，存的是使用当前jwt的用户的信息
-	CodePhoneKP = "code:phone:" //code:phone:phoneNumber  //set，存的是手机号的验证码
+	EmailCodeKP = "code:email:" //code:email:emailAddr  //set，存的是邮箱的验证码
 	IncrKP      = "icr:"        //icr:业务类型:date  //生成全局唯一id的序列号，每日更新序列号从0开始
 	BlogLikesKP = "likes:blog:"
 )

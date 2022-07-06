@@ -17,15 +17,19 @@ func InitConf() {
 	cache.InitRedis()
 	// 启动定时任务
 	tasks.CronJob()
+	//初始化邮件设置
+	utils.Init_Email_Conf()
 }
 
 func Register(r *gin.Engine) {
 	userGroup := r.Group("/user")
 	{
-		userGroup.POST("/login", web.UserWebHandler.Login)
-		userGroup.Use(utils.JwtAuth) //需要登录的路由
+		userGroup.POST("/login", web.UserWebHandler.Login)          //用户登录
+		userGroup.PUT("/register", web.UserWebHandler.Register)     //用户注册
+		userGroup.POST("/email/code", web.UserWebHandler.EmailCode) //请求发送邮箱验证码
+		userGroup.Use(utils.JwtAuth)                                //需要登录的路由
 		{
-			userGroup.GET("/info", web.UserWebHandler.Info)
+			userGroup.GET("/info", web.UserWebHandler.Info) //请求用户信息
 		}
 	}
 	blogGroup := r.Group("/blog")

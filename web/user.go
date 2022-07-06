@@ -15,6 +15,7 @@ var UserWebHandler = &userWebHandler{}
 
 type userWebHandler struct{}
 
+// 登录
 func (u *userWebHandler) Login(c *gin.Context) {
 	dto := dto.LoginRequestDTO{}
 	err := c.ShouldBindJSON(&dto)
@@ -32,6 +33,45 @@ func (u *userWebHandler) Login(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
+// 注册 //未完成
+func (u *userWebHandler) Register(c *gin.Context) {
+	// dto := dto.User_Register_ReqDTO{}
+	// err := c.ShouldBindJSON(&dto)
+	// if err != nil {
+	// 	logrus.Errorf("[userWebHandler Register] err: %v", err.Error())
+	// 	c.JSON(http.StatusBadRequest, common.NewResponseOfErr(err))
+	// 	return
+	// }
+	// resp, err := service.UserService.Register(c, &dto)
+	// if err != nil {
+	// 	logrus.Errorf("[userWebHandler Register] err: %v", err.Error())
+	// 	c.JSON(http.StatusBadRequest, resp)
+	// 	return
+	// }
+	// c.JSON(http.StatusOK, resp)
+}
+
+// 请求邮箱验证码
+func (u *userWebHandler) EmailCode(c *gin.Context) {
+	dto := dto.User_Email_Code_ReqDTO{}
+	//绑定
+	err := c.ShouldBindJSON(&dto)
+	if err != nil {
+		logrus.Errorf("[userWebHandler EmailCode] err: %v", err.Error())
+		c.JSON(http.StatusBadRequest, common.NewResponseOfErr(err))
+		return
+	}
+	//调用service
+	resp, err := service.UserService.EmailCode(c, &dto)
+	if err != nil {
+		logrus.Errorf("[userWebHandler EmailCode] err: %v", err.Error())
+		c.JSON(http.StatusBadRequest, resp)
+		return
+	}
+	c.JSON(http.StatusOK, resp)
+}
+
+//请求用户信息
 func (u *userWebHandler) Info(c *gin.Context) {
 	user_id, _ := strconv.ParseInt(c.Query("user_id"), 10, 64)
 	dto := dto.InfoRequestDTO{

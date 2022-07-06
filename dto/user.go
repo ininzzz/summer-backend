@@ -22,3 +22,12 @@ type InfoResponseDTO struct {
 	Email    string `json:"user_email"`
 	Avatar   string `json:"user_avatar"`
 }
+
+// user/email/code
+type User_Email_Code_ReqDTO struct {
+	Email string `json:"email"`
+}
+
+type User_Email_Code_RespDTO struct {
+	Ok bool `json:"ok"`
+}
