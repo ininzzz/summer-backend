@@ -9,9 +9,6 @@ import (
 )
 
 func JwtAuth(ctx *gin.Context) {
-	if strings.Contains(ctx.FullPath(), "login") {
-		return
-	}
 	ans, err := common.ParseToken(strings.Split(ctx.GetHeader("Authorization"), " ")[1])
 	if err != nil {
 		logrus.Errorf("[register] err: %v", err.Error())

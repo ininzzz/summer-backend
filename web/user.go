@@ -33,22 +33,23 @@ func (u *userWebHandler) Login(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
-// 注册 //未完成
+// 注册
 func (u *userWebHandler) Register(c *gin.Context) {
-	// dto := dto.User_Register_ReqDTO{}
-	// err := c.ShouldBindJSON(&dto)
-	// if err != nil {
-	// 	logrus.Errorf("[userWebHandler Register] err: %v", err.Error())
-	// 	c.JSON(http.StatusBadRequest, common.NewResponseOfErr(err))
-	// 	return
-	// }
-	// resp, err := service.UserService.Register(c, &dto)
-	// if err != nil {
-	// 	logrus.Errorf("[userWebHandler Register] err: %v", err.Error())
-	// 	c.JSON(http.StatusBadRequest, resp)
-	// 	return
-	// }
-	// c.JSON(http.StatusOK, resp)
+	dto := dto.User_Register_ReqDTO{}
+	//绑定
+	err := c.ShouldBindJSON(&dto)
+	if err != nil {
+		logrus.Errorf("[userWebHandler Register] err: %v", err.Error())
+		c.JSON(http.StatusBadRequest, common.NewResponseOfErr(err))
+		return
+	}
+	resp, err := service.UserService.Register(c, &dto)
+	if err != nil {
+		logrus.Errorf("[userWebHandler Register] err: %v", err.Error())
+		c.JSON(http.StatusBadRequest, resp)
+		return
+	}
+	c.JSON(http.StatusOK, resp)
 }
 
 // 请求邮箱验证码
