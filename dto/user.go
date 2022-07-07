@@ -49,6 +49,7 @@ type User_Register_UserInfo struct {
 
 type User_Register_RespDTO struct {
 	Ok       bool                   `json:"ok"`
+	Msg      string                 `json:"msg"`
 	Token    string                 `json:"token"`
 	UserInfo User_Register_UserInfo `json:"user_info"`
 }

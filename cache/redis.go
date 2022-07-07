@@ -41,6 +41,7 @@ const (
 	IncrKP      = "icr:"        //icr:业务类型:date  //生成全局唯一id的序列号，每日更新序列号从0开始
 	BlogLikesKP = "likes:blog:"
 )
+const Redis_nil = redis.Nil
 
 type TestStuct struct {
 	Id       int    `json:"id"`

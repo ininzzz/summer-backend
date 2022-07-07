@@ -39,13 +39,13 @@ func (u *userWebHandler) Register(c *gin.Context) {
 	//绑定
 	err := c.ShouldBindJSON(&dto)
 	if err != nil {
-		logrus.Errorf("[userWebHandler Register] err: %v", err.Error())
+		logrus.Errorf("[userWebHandler Register bind] err: %v", err.Error())
 		c.JSON(http.StatusBadRequest, common.NewResponseOfErr(err))
 		return
 	}
 	resp, err := service.UserService.Register(c, &dto)
 	if err != nil {
-		logrus.Errorf("[userWebHandler Register] err: %v", err.Error())
+		logrus.Errorf("[userWebHandler Register service] err: %v", err.Error())
 		c.JSON(http.StatusBadRequest, resp)
 		return
 	}

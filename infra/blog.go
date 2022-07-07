@@ -76,6 +76,7 @@ func (b *BlogRepo) FindByTimeStamp(ctx context.Context, blog *BlogQuery) ([]*mod
 	return ans, nil
 }
 
+//通过userID查找blog
 func (b *BlogRepo) FindByUserID(ctx context.Context, blog *BlogQuery) ([]*model.Blog, error) {
 	db := GetDB(ctx)
 	blogDOs := []*Blog{}
