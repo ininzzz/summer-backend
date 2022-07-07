@@ -77,7 +77,6 @@ func (repo *CommentRepo) toDO(cmt *model.Comment) (*Comment, error) {
 		Text:            cmt.Text,
 		UserID:          cmt.UserID,
 		CreateTimeStamp: cmt.CreateTimeStamp,
-		ModifyTimeStamp: cmt.ModifyTimeStamp,
 	}, nil
 }
 
@@ -88,6 +87,5 @@ func (repo *CommentRepo) toModel(cmt *Comment) (*model.Comment, error) {
 		Text:            cmt.Text,
 		UserID:          cmt.UserID,
 		CreateTimeStamp: cmt.CreateTimeStamp,
-		ModifyTimeStamp: cmt.ModifyTimeStamp,
 	}, nil
 }

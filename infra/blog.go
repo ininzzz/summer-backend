@@ -15,7 +15,6 @@ type Blog struct {
 	Text            string `gorm:"column:text"`
 	Imgs            string `gorm:"column:imgs"`
 	CreateTimestamp int64  `gorm:"column:create_time_stamp"`
-	ModifyTimestamp int64  `gorm:"column:modify_time_stamp"`
 	Like            int    `gorm:"column:like"`
 }
 
@@ -138,7 +137,6 @@ func (b *BlogRepo) toDO(blog *model.Blog) (*Blog, error) {
 		Text:            blog.Text,
 		Imgs:            blog.Imgs,
 		CreateTimestamp: blog.CreateTimestamp,
-		ModifyTimestamp: blog.ModifyTimestamp,
 	}, nil
 }
 
@@ -149,6 +147,5 @@ func (b *BlogRepo) toModel(blog *Blog) (*model.Blog, error) {
 		UserID:          blog.UserID,
 		Imgs:            blog.Imgs,
 		CreateTimestamp: blog.CreateTimestamp,
-		ModifyTimestamp: blog.ModifyTimestamp,
 	}, nil
 }

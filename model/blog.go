@@ -7,5 +7,4 @@ type Blog struct {
 	Imgs            string
 	Like            int
 	CreateTimestamp int64
-	ModifyTimestamp int64
 }
