@@ -11,7 +11,7 @@ type User struct {
 	ID         int64  `gorm:"column:user_id;primary_key"`
 	Username   string `gorm:"column:username"`
 	Password   string `gorm:"column:password"`
-	UserAvatar string `gorm:"column:user_avatar"`
+	UserAvatar string `gorm:"column:user_avatar;default:default_avatar_url"`
 	Gender     int    `gorm:"column:gender"`
 	Email      string `gorm:"column:email"`
 }
@@ -25,6 +25,31 @@ type UserQuery struct {
 type UserRepo struct {
 }
 
+//根据model中User的信息（username+password+email）创建用户，失败返回nil，
+func (u *UserRepo) CreateUser(ctx context.Context, user *model.User) (*model.User, error) {
+	db := GetDB(ctx)
+	//model转do
+	userDO, err := u.toDO(user)
+	if err != nil {
+		return nil, err
+	}
+	//查看邮件是否已存在
+	var resDO *User
+	err = db.Where("email = ?", userDO.Email).First(&resDO).Error
+	if err == gorm.ErrRecordNotFound { //邮件不存在，正常注册
+		err = db.Create(userDO).Error
+		if err != nil {
+			return nil, err
+		}
+		userModel, _ := u.toModel(userDO)
+		return userModel, nil
+	} else if err == nil { //邮件已存在,仍然返回错误信息
+		return nil, err
+	}
+	return nil, err //其他错误
+}
+
+//
 func (u *UserRepo) Save(ctx context.Context, user *model.User) error {
 	db := GetDB(ctx)
 	userDO, err := u.toDO(user)
@@ -71,7 +96,7 @@ func (u *UserRepo) Find(ctx context.Context, user *UserQuery) ([]*model.User, er
 	}
 	err := db.Find(&userDOs).Error
 	if err != nil {
-		
+
 		return nil, err
 	}
 	ans := []*model.User{}

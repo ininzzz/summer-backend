@@ -6,5 +6,4 @@ type Comment struct {
 	UserID          int64
 	Text            string
 	CreateTimeStamp int64
-	ModifyTimeStamp int64
 }
