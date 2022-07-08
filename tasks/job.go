@@ -3,6 +3,9 @@ package tasks
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
+	"os"
+	"path"
 	"time"
 
 	"github.com/ininzzz/summer-backend/cache"
@@ -17,7 +20,11 @@ func ClearDailyOrder() error {
 }
 
 //清除当前文件夹中的./imgs文件夹下的本地图片
+//因为上传到COS的方法目前要先转存到本地的imgs文件夹下，若以后改进上传到COS的方法，可以不必定期清空imgs文件夹
 func ClearDailyImgs() error {
-	//
+	dir, _ := ioutil.ReadDir("./imgs")
+	for _, d := range dir {
+		os.RemoveAll(path.Join([]string{"./imgs", d.Name()}...))
+	}
 	return nil
 }

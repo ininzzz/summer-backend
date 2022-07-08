@@ -30,8 +30,7 @@ func CreateCOSClient() {
 }
 
 func UploadImg(name string, src string) error {
-	resp, err := COS_Client.Object.PutFromFile(context.Background(), name, src, nil)
-	fmt.Printf("resp: %v\n", resp)
+	_, err := COS_Client.Object.PutFromFile(context.Background(), name, src, nil)
 	if err != nil {
 		return err
 	}

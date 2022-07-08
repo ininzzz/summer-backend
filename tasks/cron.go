@@ -31,6 +31,7 @@ func CronJob() {
 		Cron = cron.New()
 	}
 	Cron.AddFunc("0 0 0 * * *", func() { Run(ClearDailyOrder) })
+	Cron.AddFunc("0 0 0 * * *", func() { Run(ClearDailyImgs) })
 	Cron.Start()
 	fmt.Println("Cronjob start.....")
 }
