@@ -28,6 +28,22 @@ type BlogQuery struct {
 type BlogRepo struct {
 }
 
+//根据model中User的信息（username+password+email）创建用户，失败返回nil，
+func (b *BlogRepo) CreateBlog(ctx context.Context, blog *model.Blog) (*model.Blog, error) {
+	db := GetDB(ctx)
+	//model转do
+	BlogDO, err := b.toDO(blog)
+	if err != nil {
+		return nil, err
+	}
+	err = db.Create(BlogDO).Error
+	if err != nil {
+		return nil, err
+	}
+	blogModel, _ := b.toModel(BlogDO)
+	return blogModel, nil
+}
+
 //转换model中的blog类型为数据库中的Blog，存储之
 func (b *BlogRepo) Save(ctx context.Context, blog *model.Blog) error {
 	db := GetDB(ctx)
