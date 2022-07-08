@@ -19,6 +19,8 @@ func InitConf() {
 	tasks.CronJob()
 	//初始化邮件设置
 	utils.Init_Email_Conf()
+	//连接COS
+	utils.CreateCOSClient()
 }
 
 //注册路由
@@ -35,7 +37,11 @@ func Register(r *gin.Engine) {
 	}
 	blogGroup := r.Group("/blog")
 	{
-		//blogGroup.GET("/post", web.BlogWebHandler.BlogPost)            //发布帖子
+		// userGroup.Use(utils.JwtAuth) //需要登录的路由
+		// {
+		// 	blogGroup.GET("/post", web.BlogWebHandler.BlogPost) //发布帖子
+		// }
+		blogGroup.POST("/post", web.BlogWebHandler.BlogPost)            //发布帖子
 		blogGroup.GET("/home/list", web.BlogWebHandler.HomeList)       //查看首页帖子【基于滚动分页】
 		blogGroup.GET("/space/list", web.BlogWebHandler.SpaceList)     //获取某个用户发布的所有帖子【不分页】
 		blogGroup.GET("/info", web.BlogWebHandler.Info)                //获取某个帖子内容

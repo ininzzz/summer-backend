@@ -1,5 +1,18 @@
 package dto
 
+// blog/post
+type Blog_Post_ReqDTO struct {
+	UserID int64
+	Files  []string
+	Text   string
+}
+
+type Blog_Post_RespDTO struct {
+	Ok      bool   `json:"ok"`
+	Message string `json:"message"`
+	BlogID  int64  `json:"blog_id"`
+}
+
 // blog/info
 type BlogInfoRequestDTO struct {
 	BlogID int64

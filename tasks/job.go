@@ -15,3 +15,9 @@ func ClearDailyOrder() error {
 	key := "icr:order:" + date
 	return cache.RedisClient.Del(context.Background(), key).Err()
 }
+
+//清除当前文件夹中的./imgs文件夹下的本地图片
+func ClearDailyImgs() error {
+	//
+	return nil
+}
