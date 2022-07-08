@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"os"
+
 	"gopkg.in/gomail.v2"
 )
 
@@ -30,10 +32,5 @@ func SendMail(from string, mailTo []string, subject string, body string) error {
 
 //初始化邮箱设定
 func Init_Email_Conf() {
-	mail_conf = &MailConfig{
-		"xxx@qq.com", //xxx@qq.com
-		"xxx",        //password,需开通qq邮箱的smtp服务（免费）后获取
-		587,
-		"smtp.qq.com",
-	}
+	mail_conf = &MailConfig{os.Getenv("EMAIL_SMTP"), os.Getenv("EMAIL_PWD"), 587, "smtp.qq.com"}
 }
