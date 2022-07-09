@@ -28,7 +28,7 @@ type BlogQuery struct {
 type BlogRepo struct {
 }
 
-//根据model中User的信息（username+password+email）创建用户，失败返回nil，
+//根据model中blog的信息创建blog，失败返回nil，
 func (b *BlogRepo) CreateBlog(ctx context.Context, blog *model.Blog) (*model.Blog, error) {
 	db := GetDB(ctx)
 	//model转do

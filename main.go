@@ -44,7 +44,8 @@ func Register(r *gin.Engine) {
 		blogGroup.GET("/comment/list", web.BlogWebHandler.CommentList) //获取某个帖子的所有评论信息
 		blogGroup.Use(utils.JwtAuth())                                 //需要登录的路由
 		{
-			blogGroup.POST("/post", web.BlogWebHandler.BlogPost) //发布帖子
+			blogGroup.PUT("/comment/post", web.BlogWebHandler.BlogCommentPost) //发布评论
+			blogGroup.POST("/post", web.BlogWebHandler.BlogPost)               //发布帖子
 		}
 	}
 }

@@ -14,7 +14,8 @@ import (
 var BlogService blogService
 
 type blogService struct {
-	blogRepo infra.BlogRepo
+	blogRepo    infra.BlogRepo
+	commentRepo infra.CommentRepo
 }
 
 //string数组连成一个string，用分号分割
@@ -150,5 +151,28 @@ func (s *blogService) Info(ctx context.Context, reqDTO *dto.BlogInfoRequestDTO) 
 		return common.NewResponseOfSuccess(data), nil
 	}
 	//查找结果为空
+	return common.NewResponseOfSuccess(nil), nil
+}
+
+//service-发布comment
+func (s *blogService) BlogCommentPost(ctx context.Context, reqDTO *dto.Blog_Comment_Post_ReqDTO) (*common.Response, error) {
+	//在mysql表中创建新的comment
+	comment_create_resp, err := s.commentRepo.CreateComment(ctx, &model.Comment{
+		UserID:          reqDTO.UserID,
+		Text:            reqDTO.Text,
+		BlogID:          reqDTO.BlogID,
+		CreateTimeStamp: time.Now().Unix(),
+	})
+	if err != nil {
+		return common.NewResponseOfErr(err), err
+	}
+	//创建comment成功
+	if comment_create_resp != nil {
+		data := &dto.Blog_Comment_Post_RespDTO{
+			Ok:      true,
+			Message: "",
+		}
+		return common.NewResponseOfSuccess(data), nil
+	}
 	return common.NewResponseOfSuccess(nil), nil
 }

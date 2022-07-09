@@ -5,7 +5,6 @@ import (
 
 	"github.com/ininzzz/summer-backend/model"
 	"github.com/sirupsen/logrus"
-	"gorm.io/gorm"
 )
 
 //数据库中存储的blog表结构
@@ -15,7 +14,6 @@ type Comment struct {
 	UserID          int64  `gorm:"column:user_id"`
 	Text            string `gorm:"column:text"`
 	CreateTimeStamp int64  `gorm:"column:create_time_stamp"`
-	ModifyTimeStamp int64  `gorm:"column:modify_time_stamp"`
 }
 
 //查询用
@@ -26,24 +24,20 @@ type CommentQuery struct {
 type CommentRepo struct {
 }
 
-func (repo *CommentRepo) Save(ctx context.Context, cmt *model.Comment) error {
+//根据model中Comment的信息创建comment，失败返回nil，
+func (repo *CommentRepo) CreateComment(ctx context.Context, comment *model.Comment) (*model.Comment, error) {
 	db := GetDB(ctx)
-	CmtDO, err := repo.toDO(cmt)
+	//model转do
+	CommentDO, err := repo.toDO(comment)
 	if err != nil {
-		logrus.Errorf("[CommentRepo Save] err: %v", err.Error())
-		return err
+		return nil, err
 	}
-	err = db.Where("blog_id = ?", CmtDO.BlogID).Error
-	if err == gorm.ErrRecordNotFound {
-		err = db.Create(CmtDO).Error
-	} else if err == nil {
-		err = db.Save(CmtDO).Error
-	}
+	err = db.Create(CommentDO).Error
 	if err != nil {
-		logrus.Errorf("[CommentRepo Save] err: %v", err.Error())
-		return err
+		return nil, err
 	}
-	return nil
+	commentModel, _ := repo.toModel(CommentDO)
+	return commentModel, nil
 }
 
 //根据BlogQuery中的参数查询,返回model类型的blog
