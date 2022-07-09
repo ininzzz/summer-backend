@@ -100,12 +100,15 @@ func (w *blogWebHandler) BlogPost(c *gin.Context) {
 		//将随机数转换类型
 		format_rand_num := strconv.FormatInt(int64(rand_num), 10)
 		name := format_time_stamp + format_rand_num + suffix
-		//写入保存位置与自定义名称，并且带上文件自带后缀名
-		dst := path.Join("./imgs", name)
-		// 存储文件
-		_ = c.SaveUploadedFile(file, dst)
-		//上传cos后
-		err := utils.UploadImg(name, dst)
+		// //写入保存位置与自定义名称，并且带上文件自带后缀名
+		// dst := path.Join("./imgs", name)
+		// // 存储文件
+		// _ = c.SaveUploadedFile(file, dst)
+
+		//上传cos
+		f, _ := file.Open()
+		err := utils.UploadImg_Reader(name, f) //通过io.Reader上传
+		//err := utils.UploadImg_Local(name, dst) //先存储到本地再上传
 		if err != nil {
 			c.JSON(http.StatusBadRequest, err)
 		}

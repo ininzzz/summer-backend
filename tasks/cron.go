@@ -31,7 +31,8 @@ func CronJob() {
 		Cron = cron.New()
 	}
 	Cron.AddFunc("0 0 0 * * *", func() { Run(ClearDailyOrder) })
-	Cron.AddFunc("0 0 0 * * *", func() { Run(ClearDailyImgs) })
+	//修改上传COS的方式后，不再需要清空imgs文件夹
+	//Cron.AddFunc("0 0 0 * * *", func() { Run(ClearDailyImgs) })
 	Cron.Start()
 	fmt.Println("Cronjob start.....")
 }

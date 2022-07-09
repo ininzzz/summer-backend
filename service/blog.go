@@ -180,6 +180,12 @@ func (s *blogService) BlogCommentPost(ctx context.Context, reqDTO *dto.Blog_Comm
 
 //service-查询是否点赞了某条blog
 func (s *blogService) BlogIfLiked(ctx context.Context, reqDTO *dto.Blog_If_Liked_ReqDTO) (*common.Response, error) {
+	if reqDTO.UserID == 0 { //未登录
+		data := &dto.Blog_If_Liked_RespDTO{
+			Liked: false,
+		}
+		return common.NewResponseOfSuccess(data), nil
+	}
 	//查询是否存在
 	resp, err := s.likeRepo.FindIfExist(ctx, &infra.LikeQuery{
 		UserID: &reqDTO.UserID,

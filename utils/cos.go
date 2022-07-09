@@ -3,6 +3,7 @@ package utils
 import (
 	"context"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -26,11 +27,21 @@ func CreateCOSClient() {
 		},
 	})
 	COS_Client = c
-	fmt.Printf("成功连接COS\n")
+	if COS_Client != nil {
+		fmt.Printf("成功连接COS\n")
+	}
+
 }
 
-func UploadImg(name string, src string) error {
+func UploadImg_Local(name string, src string) error {
 	_, err := COS_Client.Object.PutFromFile(context.Background(), name, src, nil)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+func UploadImg_Reader(name string, file io.Reader) error {
+	_, err := COS_Client.Object.Put(context.Background(), name, file, nil)
 	if err != nil {
 		return err
 	}
