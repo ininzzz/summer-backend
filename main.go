@@ -43,10 +43,11 @@ func Register(r *gin.Engine) {
 		blogGroup.GET("/info", web.BlogWebHandler.Info)                //获取某个帖子内容
 		blogGroup.GET("/comment/list", web.BlogWebHandler.CommentList) //获取某个帖子的所有评论信息
 		blogGroup.GET("/if/liked", web.BlogWebHandler.BlogIfLiked)     //查询用户是否带点赞过某个帖子
+		blogGroup.POST("/post", web.BlogWebHandler.BlogPost)           //发布帖子
 		blogGroup.Use(utils.JwtAuth())                                 //需要登录的路由
 		{
 			blogGroup.PUT("/comment/post", web.BlogWebHandler.BlogCommentPost) //发布评论
-			blogGroup.POST("/post", web.BlogWebHandler.BlogPost)               //发布帖子
+
 		}
 	}
 }
