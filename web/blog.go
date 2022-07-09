@@ -130,8 +130,7 @@ func (w *blogWebHandler) BlogPost(c *gin.Context) {
 }
 
 //发表评论 blog/comment/post
-
-func (b *blogWebHandler) BlogCommentPost(c *gin.Context) {
+func (w *blogWebHandler) BlogCommentPost(c *gin.Context) {
 	//绑定数据
 	dto := dto.Blog_Comment_Post_ReqDTO{
 		UserID: c.GetInt64("UserID"), //需要登录验证，不然会取到用户ID为0
@@ -146,6 +145,28 @@ func (b *blogWebHandler) BlogCommentPost(c *gin.Context) {
 	resp, err := service.BlogService.BlogCommentPost(c, &dto)
 	if err != nil {
 		logrus.Errorf("[blogWebHandler BlogCommentPost] err: %v", err.Error())
+		c.JSON(http.StatusBadRequest, resp)
+		return
+	}
+	c.JSON(http.StatusOK, resp)
+}
+
+//是否点赞过某条blog  blog/if/liked
+func (w *blogWebHandler) BlogIfLiked(c *gin.Context) {
+	//绑定数据
+	dto := dto.Blog_If_Liked_ReqDTO{
+		UserID: c.GetInt64("UserID"), //不需要登录验证，若没有登录会取到用户ID为0
+	}
+	err := c.ShouldBindJSON(&dto)
+	if err != nil {
+		logrus.Errorf("[blogWebHandler BlogIfLiked bind] err: %v", err.Error())
+		c.JSON(http.StatusBadRequest, common.NewResponseOfErr(err))
+		return
+	}
+	//请求服务
+	resp, err := service.BlogService.BlogIfLiked(c, &dto)
+	if err != nil {
+		logrus.Errorf("[blogWebHandler BlogIfLiked] err: %v", err.Error())
 		c.JSON(http.StatusBadRequest, resp)
 		return
 	}

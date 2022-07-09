@@ -26,3 +26,8 @@ create table `comment`(
     `create_time_stamp` bigint(20) unsigned not null,
     primary key(`comment_id`)
 );
+
+create table `like`(
+    `blog_id` bigint(20) unsigned not null,
+    `user_id` bigint(20) unsigned not null,
+);

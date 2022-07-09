@@ -16,6 +16,7 @@ var BlogService blogService
 type blogService struct {
 	blogRepo    infra.BlogRepo
 	commentRepo infra.CommentRepo
+	likeRepo    infra.LikeRepo
 }
 
 //string数组连成一个string，用分号分割
@@ -175,4 +176,21 @@ func (s *blogService) BlogCommentPost(ctx context.Context, reqDTO *dto.Blog_Comm
 		return common.NewResponseOfSuccess(data), nil
 	}
 	return common.NewResponseOfSuccess(nil), nil
+}
+
+//service-查询是否点赞了某条blog
+func (s *blogService) BlogIfLiked(ctx context.Context, reqDTO *dto.Blog_If_Liked_ReqDTO) (*common.Response, error) {
+	//查询是否存在
+	resp, err := s.likeRepo.FindIfExist(ctx, &infra.LikeQuery{
+		UserID: &reqDTO.UserID,
+		BlogID: &reqDTO.BlogID,
+	})
+	if err != nil {
+		return common.NewResponseOfErr(err), err
+	}
+	//查询成功
+	data := &dto.Blog_If_Liked_RespDTO{
+		Liked: resp,
+	}
+	return common.NewResponseOfSuccess(data), nil
 }
