@@ -11,3 +11,15 @@ type BlogCommentListResponseDTO struct {
 	UserAvatar string `json:"user_avatar"`
 	Text       string `json:"text"`
 }
+
+// blog/comment/post
+type Blog_Comment_Post_ReqDTO struct {
+	BlogID int64  `json:"blog_id"`
+	Text   string `json:"text"`
+	UserID int64
+}
+
+type Blog_Comment_Post_RespDTO struct {
+	Ok      bool   `json:"ok"`
+	Message string `json:"message"`
+}

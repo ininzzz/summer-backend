@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/ininzzz/summer-backend/common"
 	"github.com/ininzzz/summer-backend/dto"
 	"github.com/ininzzz/summer-backend/service"
 	"github.com/ininzzz/summer-backend/utils"
@@ -19,7 +20,7 @@ var BlogWebHandler = &blogWebHandler{}
 type blogWebHandler struct{}
 
 // 查看首页帖子【基于滚动分页】  /home/list
-func (u *blogWebHandler) HomeList(c *gin.Context) {
+func (w *blogWebHandler) HomeList(c *gin.Context) {
 	lastTimeStamp, _ := strconv.ParseInt(c.Query("lastTimeStamp"), 10, 64)
 	dto := dto.BlogHomeListRequestDTO{
 		LastTimeStamp: lastTimeStamp,
@@ -34,7 +35,7 @@ func (u *blogWebHandler) HomeList(c *gin.Context) {
 }
 
 //获取某个用户发布的所有帖子【不分页】  /space/list
-func (u *blogWebHandler) SpaceList(c *gin.Context) {
+func (w *blogWebHandler) SpaceList(c *gin.Context) {
 	UID, _ := strconv.ParseInt(c.Query("UserID"), 10, 64)
 	dto := dto.BlogSpaceListRequestDTO{
 		UserID: UID,
@@ -49,7 +50,7 @@ func (u *blogWebHandler) SpaceList(c *gin.Context) {
 }
 
 //获取某个帖子下的所有评论信息【不分页】  /comment/list
-func (u *blogWebHandler) CommentList(c *gin.Context) {
+func (w *blogWebHandler) CommentList(c *gin.Context) {
 	BID, _ := strconv.ParseInt(c.Query("blog_id"), 10, 64)
 	dto := dto.BlogCommentListRequestDTO{
 		BlogID: BID,
@@ -64,7 +65,7 @@ func (u *blogWebHandler) CommentList(c *gin.Context) {
 }
 
 // blog/info
-func (u *blogWebHandler) Info(c *gin.Context) {
+func (w *blogWebHandler) Info(c *gin.Context) {
 	BID, _ := strconv.ParseInt(c.Query("blog_id"), 10, 64)
 	dto := dto.BlogInfoRequestDTO{
 		BlogID: BID,
@@ -79,7 +80,7 @@ func (u *blogWebHandler) Info(c *gin.Context) {
 }
 
 //发布帖子  /blog/post
-func (u *blogWebHandler) BlogPost(c *gin.Context) {
+func (w *blogWebHandler) BlogPost(c *gin.Context) {
 	//绑定数据
 	form, _ := c.MultipartForm()
 	files := form.File["files"]
@@ -121,7 +122,30 @@ func (u *blogWebHandler) BlogPost(c *gin.Context) {
 	//请求服务
 	resp, err := service.BlogService.BlogPost(c, &dto)
 	if err != nil {
-		logrus.Errorf("[blogWebHandler CommentList] err: %v", err.Error())
+		logrus.Errorf("[blogWebHandler BlogPost] err: %v", err.Error())
+		c.JSON(http.StatusBadRequest, resp)
+		return
+	}
+	c.JSON(http.StatusOK, resp)
+}
+
+//发表评论 blog/comment/post
+
+func (b *blogWebHandler) BlogCommentPost(c *gin.Context) {
+	//绑定数据
+	dto := dto.Blog_Comment_Post_ReqDTO{
+		UserID: c.GetInt64("UserID"), //需要登录验证，不然会取到用户ID为0
+	}
+	err := c.ShouldBindJSON(&dto)
+	if err != nil {
+		logrus.Errorf("[blogWebHandler BlogCommentPost bind] err: %v", err.Error())
+		c.JSON(http.StatusBadRequest, common.NewResponseOfErr(err))
+		return
+	}
+	//请求服务
+	resp, err := service.BlogService.BlogCommentPost(c, &dto)
+	if err != nil {
+		logrus.Errorf("[blogWebHandler BlogCommentPost] err: %v", err.Error())
 		c.JSON(http.StatusBadRequest, resp)
 		return
 	}
