@@ -52,7 +52,7 @@ func (repo *LikeRepo) FindIfExist(ctx context.Context, like_query *LikeQuery) (b
 	}
 }
 
-//查看是否存在某条记录，若存在则删除，若不存在则添加,返回是否执行成功
+//查看是否存在某条记录，若存在则删除，若不存在则添加,返回true表示添加，false表示删去
 func (repo *LikeRepo) AddOrRemove(ctx context.Context, like_query *LikeQuery) (bool, error) {
 	db := GetDB(ctx)
 	var like Like
@@ -74,7 +74,7 @@ func (repo *LikeRepo) AddOrRemove(ctx context.Context, like_query *LikeQuery) (b
 		if res.Error != nil {
 			return false, res.Error
 		}
-		return true, nil
+		return false, nil
 	}
 }
 

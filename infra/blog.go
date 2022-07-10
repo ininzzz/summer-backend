@@ -136,6 +136,25 @@ func (b *BlogRepo) FindByBlogID(ctx context.Context, blog *BlogQuery) ([]*model.
 	return ans, nil
 }
 
+//增加like
+func (b *BlogRepo) AddLike(ctx context.Context, blog_query *BlogQuery) error {
+	db := GetDB(ctx)
+	err := db.Table("blog").Where("blog_id = ?", blog_query.BlogID).UpdateColumn("like", gorm.Expr("`like` + ?", 1)).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+//删除like
+func (b *BlogRepo) RemoveLike(ctx context.Context, blog_query *BlogQuery) error {
+	db := GetDB(ctx)
+	err := db.Table("blog").Where("blog_id = ?", *blog_query.BlogID).UpdateColumn("like", gorm.Expr("`like` - ?", 1)).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
 func (b *BlogRepo) UpdateField(ctx context.Context, blog *model.Blog) error {
 	db := GetDB(ctx)
 	err := db.Model(&blog).Updates(blog).Error
