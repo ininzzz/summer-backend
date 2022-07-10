@@ -175,3 +175,25 @@ func (w *blogWebHandler) BlogIfLiked(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, resp)
 }
+
+//点赞/取消点赞某条blog  blog/like
+func (w *blogWebHandler) BlogLike(c *gin.Context) {
+	//绑定数据
+	dto := dto.Blog_Like_ReqDTO{
+		UserID: c.GetInt64("UserID"), //需要登录验证
+	}
+	err := c.ShouldBindJSON(&dto)
+	if err != nil {
+		logrus.Errorf("[blogWebHandler BlogLike bind] err: %v", err.Error())
+		c.JSON(http.StatusBadRequest, common.NewResponseOfErr(err))
+		return
+	}
+	//请求服务
+	resp, err := service.BlogService.BlogLike(c, &dto)
+	if err != nil {
+		logrus.Errorf("[blogWebHandler BlogLike service] err: %v", err.Error())
+		c.JSON(http.StatusBadRequest, resp)
+		return
+	}
+	c.JSON(http.StatusOK, resp)
+}

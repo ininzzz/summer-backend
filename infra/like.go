@@ -52,6 +52,32 @@ func (repo *LikeRepo) FindIfExist(ctx context.Context, like_query *LikeQuery) (b
 	}
 }
 
+//查看是否存在某条记录，若存在则删除，若不存在则添加,返回是否执行成功
+func (repo *LikeRepo) AddOrRemove(ctx context.Context, like_query *LikeQuery) (bool, error) {
+	db := GetDB(ctx)
+	var like Like
+	results := db.Table("like").Where("user_id = ? and blog_id = ?", like_query.UserID, like_query.BlogID).First(&like)
+	if results.Error != nil {
+		if results.Error == gorm.ErrRecordNotFound { //没找到
+			//add
+			like := Like{UserID: *like_query.UserID, BlogID: *like_query.BlogID}
+			results := db.Table("like").Create(&like)
+			if results.Error != nil {
+				return false, results.Error
+			}
+			return true, nil
+		}
+		return false, results.Error //其他错误
+	} else { //找到了
+		//remove
+		res := results.Table("like").Delete(&like)
+		if res.Error != nil {
+			return false, res.Error
+		}
+		return true, nil
+	}
+}
+
 func (repo *LikeRepo) toDO(like *model.Like) (*Like, error) {
 	return &Like{
 		BlogID: like.BlogID,

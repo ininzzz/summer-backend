@@ -70,3 +70,12 @@ type Blog_If_Liked_ReqDTO struct {
 type Blog_If_Liked_RespDTO struct {
 	Liked bool `json:"liked"`
 }
+
+//blog/like
+type Blog_Like_ReqDTO struct {
+	BlogID int64 `json:"blog_id"`
+	UserID int64
+}
+type Blog_Like_RespDTO struct {
+	Ok bool `json:"ok"`
+}
