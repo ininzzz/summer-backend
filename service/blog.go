@@ -203,7 +203,7 @@ func (s *blogService) BlogIfLiked(ctx context.Context, reqDTO *dto.Blog_If_Liked
 
 //service-点赞/取消点赞某条blog
 func (s *blogService) BlogLike(ctx context.Context, reqDTO *dto.Blog_Like_ReqDTO) (*common.Response, error) {
-	//查询是否存在
+	//操作like表
 	resp, err := s.likeRepo.AddOrRemove(ctx, &infra.LikeQuery{
 		UserID: &reqDTO.UserID,
 		BlogID: &reqDTO.BlogID,
@@ -211,9 +211,25 @@ func (s *blogService) BlogLike(ctx context.Context, reqDTO *dto.Blog_Like_ReqDTO
 	if err != nil {
 		return common.NewResponseOfErr(err), err
 	}
-	//查询成功
+	//操作blog表
+	if resp {
+		err := s.blogRepo.AddLike(ctx, &infra.BlogQuery{
+			BlogID: &reqDTO.BlogID,
+		})
+		if err != nil {
+			return common.NewResponseOfErr(err), err
+		}
+	} else {
+		err := s.blogRepo.RemoveLike(ctx, &infra.BlogQuery{
+			BlogID: &reqDTO.BlogID,
+		})
+		if err != nil {
+			return common.NewResponseOfErr(err), err
+		}
+	}
+	//操作成功
 	data := &dto.Blog_Like_RespDTO{
-		Ok: resp,
+		Ok: true,
 	}
 	return common.NewResponseOfSuccess(data), nil
 }
